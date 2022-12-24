@@ -32,11 +32,10 @@ public class TiersManager {
         }
     }
 
-
-
     private List<String> extractStringList(JsonObject data, String key) {
         List<String> list = new ArrayList<>();
         data.getAsJsonArray(key).forEach(element -> list.add(element.getAsString()));
+
         return list;
     }
 

@@ -21,7 +21,7 @@ public class TierTagger implements ModInitializer {
 
         MutableText tier = getPlayerTier(text.getString());
         if (tier != null) {
-            tier.append(Text.literal(" | ").styled(s -> s.withColor(Formatting.GRAY)));
+            tier.append(Text.of(" | ").copy().styled(s -> s.withColor(Formatting.GRAY)));
             return tier.append(text);
         }
 
@@ -33,7 +33,7 @@ public class TierTagger implements ModInitializer {
 
         if (tiers.playerTiers.containsKey(username)) {
             String foundTier = tiers.playerTiers.get(username);
-            MutableText tier = Text.literal(foundTier);
+            MutableText tier = Text.of(foundTier).copy();
             if (username.equals("Ooh_Netiyiy")) {
                 tier.styled(s -> s.withColor(TextColor.parse("#A020F0")));
             } else {

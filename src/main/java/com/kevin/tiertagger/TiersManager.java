@@ -24,11 +24,6 @@ public class TiersManager {
                 String tierSet = tierGet.substring(0, 1).toUpperCase() + tierGet.substring(1);
                 extractStringList(data, tierGet).forEach(player -> playerTiers.put(player, tierSet));
             }
-
-            for (String player : playerTiers.keySet()) {
-                System.out.println(player + ": " + playerTiers.get(player) + ", Works!");
-                return;
-            }
         }
     }
 
@@ -38,5 +33,6 @@ public class TiersManager {
 
         return list;
     }
+    // hello
 
 }

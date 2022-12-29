@@ -9,6 +9,7 @@ import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,7 +30,7 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
     )
     public void nametagReplace(LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> instance, Entity entity, Text text, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         // Sorta like a tunnel: text -> appendTier(text) -> text <tier> -> super.renderLabelIfPresent(text) -> completed!
-        text = TierTagger.appendTier(text);
+        text = TierTagger.appendTier((PlayerEntity) entity, text);
         super.renderLabelIfPresent((AbstractClientPlayerEntity) entity, text, matrixStack, vertexConsumerProvider, i);
     }
 }

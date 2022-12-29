@@ -1,6 +1,7 @@
 package com.kevin.tiertagger;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -13,13 +14,12 @@ public class TierTagger implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        System.out.println("Hello World!");
         tiers.tiersLoader();
     }
 
-    public static Text appendTier(Text text) {
+    public static Text appendTier(PlayerEntity player, Text text) {
 
-        MutableText tier = getPlayerTier(text.getString());
+        MutableText tier = getPlayerTier(player.getEntityName());
         if (tier != null) {
             tier.append(Text.literal(" | ").styled(s -> s.withColor(Formatting.GRAY)));
             return tier.append(text);

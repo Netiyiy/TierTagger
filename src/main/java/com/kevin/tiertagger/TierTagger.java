@@ -15,6 +15,7 @@ public class TierTagger implements ModInitializer {
     @Override
     public void onInitialize() {
         tiers.tiersLoader();
+        System.out.println(tiers.playerTiers.get("Ooh_Netiyiy") + " | Ooh_Netiyiy");
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
@@ -49,16 +50,16 @@ public class TierTagger implements ModInitializer {
     private static int getTierColor(String tier) {
 
         return switch (tier) {
-            case "Ht1" -> 0xFF0000; // red
-            case "Lt1" -> 0xFFB6C1; // light pink
-            case "Ht2" -> 0xFFA500; // orange
-            case "Lt2" -> 0xFFE4B5; // light orange
-            case "Ht3" -> 0xDAA520; // goldenrod
-            case "Lt3" -> 0xEEE8AA; // pale goldenrod
-            case "Ht4" -> 0x006400; // dark green
-            case "Lt4" -> 0x90EE90; // light green
-            case "Ht5" -> 0x808080; // grey
-            case "Lt5" -> 0xD3D3D3; // pale grey
+            case "HT1" -> 0xFF0000; // red
+            case "LT1" -> 0xFFB6C1; // light pink
+            case "HT2" -> 0xFFA500; // orange
+            case "LT2" -> 0xFFE4B5; // light orange
+            case "HT3" -> 0xDAA520; // goldenrod
+            case "LT3" -> 0xEEE8AA; // pale goldenrod
+            case "HT4" -> 0x006400; // dark green
+            case "LT4" -> 0x90EE90; // light green
+            case "HT5" -> 0x808080; // grey
+            case "LT5" -> 0xD3D3D3; // pale grey
             default -> 0xD3D3D3; // DEFAULT: pale grey
         };
     }

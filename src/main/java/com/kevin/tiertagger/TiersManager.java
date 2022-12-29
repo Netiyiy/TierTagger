@@ -20,19 +20,9 @@ public class TiersManager {
 
             playerTiers = new HashMap<>();
 
-            for (String tierGet : data.keySet()) {
-                String tierSet = tierGet.substring(0, 1).toUpperCase() + tierGet.substring(1);
-                extractStringList(data, tierGet).forEach(player -> playerTiers.put(player, tierSet));
+            for (String player : data.keySet()) {
+                playerTiers.put(player, String.valueOf(data.get(player)));
             }
         }
     }
-
-    private List<String> extractStringList(JsonObject data, String key) {
-        List<String> list = new ArrayList<>();
-        data.getAsJsonArray(key).forEach(element -> list.add(element.getAsString()));
-
-        return list;
-    }
-    // hello there!
-
 }

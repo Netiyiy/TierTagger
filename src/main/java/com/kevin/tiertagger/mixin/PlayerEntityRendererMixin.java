@@ -29,7 +29,6 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
     public void nametagReplace(Args args) {
         PlayerEntity entity = args.get(0);
         Text text = args.get(1);
-
         // Sorta like a tunnel: text -> appendTier(text) -> text <tier> -> super.renderLabelIfPresent(text) -> completed!
         text = TierTagger.appendTier(entity, text);
         args.set(1, text);

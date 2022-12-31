@@ -3,7 +3,7 @@
   "id": "tier-tagger",
   "version": "${version}",
   "name": "TierTagger",
-  "description": "",
+  "description": "A gorgeous mod which displays everyone's tier from the Vanilla Pvp Tierlist in game",
   "authors": ["netiyiy"],
   "contact": {},
   "license": "MIT",

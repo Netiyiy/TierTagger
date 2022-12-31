@@ -21,7 +21,7 @@ public class TiersManager {
             playerTiers = new HashMap<>();
 
             for (String player : data.keySet()) {
-                playerTiers.put(player, String.valueOf(data.get(player)));
+                playerTiers.put(player, String.valueOf(data.get(player)).replace("\"", ""));
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.kevin.tiertagger.mixin;
+package com.kevin.tiertagger.mixins;
 
 import com.kevin.tiertagger.TierTagger;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
-
 
 @Mixin(PlayerEntityRenderer.class)
 public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
@@ -31,6 +30,9 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
         Text text = args.get(1);
         // Sorta like a tunnel: text -> appendTier(text) -> text <tier> -> super.renderLabelIfPresent(text) -> completed!
         text = TierTagger.appendTier(entity, text);
+        if (text == null) {
+            throw new NullPointerException("Tier formatting failed, please contact netiyiy#2023 on Discord");
+        }
         args.set(1, text);
     }
 }

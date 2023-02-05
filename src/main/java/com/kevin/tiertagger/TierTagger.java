@@ -1,69 +1,37 @@
 package com.kevin.tiertagger;
 
+import com.kevin.tiertagger.util.Gamemode;
+import com.kevin.tiertagger.util.TieredPlayer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
-import org.jetbrains.annotations.Nullable;
 
 public class TierTagger implements ModInitializer {
 
-    private static final TiersManager tiers = new TiersManager();
+    private static TierManager tierManager;
+    private static TierText tierText;
 
     @Override
     public void onInitialize() {
-        tiers.tiersLoader();
-        System.out.println(tiers.playerTiers.get("Ooh_Netiyiy") + " | Ooh_Netiyiy");
+        tierManager = new TierManager();
+        tierText = new TierText();
+        tierManager.tiersLoader();
+        System.out.println("TierTagger by Ooh_Netiyiy has been initialized");
     }
 
-    public static Text appendTier(PlayerEntity player, Text text) {
+    public static Text appendTier(PlayerEntity player, Text username) {
 
-        MutableText tier = getPlayerTier(player.getEntityName());
-        if (tier != null) {
-            tier.append(Text.of(" | ").copy().styled(s -> s.withColor(Formatting.GRAY)));
-            return tier.append(text);
-        }
-
-        return text;
-    }
-
-    @Nullable
-    private static MutableText getPlayerTier(String username) {
-
-        if (tiers.playerTiers.containsKey(username)) {
-            String foundTier = tiers.playerTiers.get(username);
-            MutableText tier = Text.of(foundTier).copy();
-            if (username.equals("Ooh_Netiyiy")) {
-                tier.styled(s -> s.withColor(TextColor.parse("#A020F0")));
-            } else {
-                int color = getTierColor(foundTier);
-                tier.styled(s -> s.withColor(color));
+        if (tierManager.isPlayerTiered(username.asString())) {
+            TieredPlayer tieredPlayer = tierManager.getPlayerTiers().get(player.getEntityName());
+            MutableText tag = tierText.getTier(tieredPlayer.getTier(Gamemode.VANILLA));
+            if (tag != null) {
+                tag.append(Text.of(" | ").copy().styled(s -> s.withColor(Formatting.GRAY)));
+                return tag.append(username);
             }
-            return tier;
-        } else {
-            return null;
         }
+        return username;
     }
-
-    private static int getTierColor(String tier) {
-
-        return switch (tier) {
-            case "HT1" -> 0xFF0000; // red
-            case "LT1" -> 0xFFB6C1; // light pink
-            case "HT2" -> 0xFFA500; // orange
-            case "LT2" -> 0xFFE4B5; // light orange
-            case "HT3" -> 0xDAA520; // goldenrod
-            case "LT3" -> 0xEEE8AA; // pale goldenrod
-            case "HT4" -> 0x006400; // dark green
-            case "LT4" -> 0x90EE90; // light green
-            case "HT5" -> 0x808080; // grey
-            case "LT5" -> 0xD3D3D3; // pale grey
-            default -> 0xD3D3D3; // DEFAULT: pale grey
-        };
-    }
-
-
 
 }

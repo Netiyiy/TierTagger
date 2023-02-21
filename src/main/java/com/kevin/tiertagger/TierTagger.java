@@ -7,15 +7,17 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TierTagger implements ModInitializer {
 
     private static final TiersManager tiers = new TiersManager();
+    private static final Logger logger = LoggerFactory.getLogger("TierTagger");
 
     @Override
     public void onInitialize() {
-        tiers.tiersLoader();
-        System.out.println(tiers.playerTiers.get("Ooh_Netiyiy") + " | Ooh_Netiyiy");
+        tiers.loadTiers();
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
@@ -31,7 +33,6 @@ public class TierTagger implements ModInitializer {
 
     @Nullable
     private static MutableText getPlayerTier(String username) {
-
         if (tiers.playerTiers.containsKey(username)) {
             String foundTier = tiers.playerTiers.get(username);
             MutableText tier = Text.of(foundTier).copy();
@@ -64,6 +65,8 @@ public class TierTagger implements ModInitializer {
         };
     }
 
-
+    public static Logger getLogger() {
+        return logger;
+    }
 
 }

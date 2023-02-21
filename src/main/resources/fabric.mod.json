@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "tier-tagger",
+  "id": "tiertagger",
   "version": "${version}",
   "name": "TierTagger",
   "description": "A gorgeous mod which displays everyone's tier from the Vanilla Pvp Tierlist in game",

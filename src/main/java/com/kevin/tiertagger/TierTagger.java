@@ -1,5 +1,7 @@
 package com.kevin.tiertagger;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
@@ -8,14 +10,29 @@ import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
-public class TierTagger implements ModInitializer {
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.Map;
 
-    private static final TiersManager tiers = new TiersManager();
+public class TierTagger implements ModInitializer {
+    public static final URI ENDPOINT = URI.create("https://api.uku3lig.net/tiers/vanilla");
+
+    private static final Map<String, String> tiers = new HashMap<>();
 
     @Override
     public void onInitialize() {
-        tiers.tiersLoader();
-        System.out.println(tiers.playerTiers.get("Ooh_Netiyiy") + " | Ooh_Netiyiy");
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest.newBuilder(ENDPOINT).GET().build();
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenAccept(s -> {
+                    JsonObject o = new Gson().fromJson(s, JsonObject.class);
+                    o.entrySet().forEach(e -> tiers.put(e.getKey(), e.getValue().getAsString()));
+                })
+                .whenComplete((s, t) -> System.out.println(tiers.get("Ooh_Netiyiy") + " | Ooh_Netiyiy"));
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
@@ -31,9 +48,8 @@ public class TierTagger implements ModInitializer {
 
     @Nullable
     private static MutableText getPlayerTier(String username) {
-
-        if (tiers.playerTiers.containsKey(username)) {
-            String foundTier = tiers.playerTiers.get(username);
+        if (tiers.containsKey(username)) {
+            String foundTier = tiers.get(username);
             MutableText tier = Text.of(foundTier).copy();
             if (username.equals("Ooh_Netiyiy")) {
                 tier.styled(s -> s.withColor(TextColor.parse("#A020F0")));
@@ -63,7 +79,6 @@ public class TierTagger implements ModInitializer {
             default -> 0xD3D3D3; // DEFAULT: pale grey
         };
     }
-
 
 
 }

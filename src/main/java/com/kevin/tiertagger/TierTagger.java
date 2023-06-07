@@ -32,7 +32,7 @@ public class TierTagger implements ModInitializer {
                     JsonObject o = new Gson().fromJson(s, JsonObject.class);
                     o.entrySet().forEach(e -> tiers.put(e.getKey(), e.getValue().getAsString()));
                 })
-                .whenComplete((s, t) -> System.out.println(tiers.get("Ooh_Netiyiy") + " | Ooh_Netiyiy"));
+                .whenComplete((s, t) -> System.out.println("success"));
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
@@ -51,12 +51,9 @@ public class TierTagger implements ModInitializer {
         if (tiers.containsKey(username)) {
             String foundTier = tiers.get(username);
             MutableText tier = Text.of(foundTier).copy();
-            if (username.equals("Ooh_Netiyiy")) {
-                tier.styled(s -> s.withColor(TextColor.parse("#A020F0")));
-            } else {
-                int color = getTierColor(foundTier);
-                tier.styled(s -> s.withColor(color));
-            }
+
+            int color = getTierColor(foundTier);
+            tier.styled(s -> s.withColor(color));
             return tier;
         } else {
             return null;

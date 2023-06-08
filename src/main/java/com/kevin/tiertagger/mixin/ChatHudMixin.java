@@ -42,15 +42,19 @@ public class ChatHudMixin {
     }
 
     public String getTier(OrderedText content){
+  
         final String[] result = new String[1];
         TierTagger.messagesWithAuthor.keySet().forEach(x -> {
             if (TierTagger.messagesWithAuthor.get(x).equals(content.toString())) {
                 result[0] = (Objects.requireNonNull(getPlayerTier(TierTagger.messagesWithAuthor.get(x).toString())).toString());
-            } else {
-                result[0] = "U";
             }
+
         });
-        return result[0];
+        if(result != null){
+            return result[0];
+        } else {
+            return "UN";
+        }
     }
 }
 

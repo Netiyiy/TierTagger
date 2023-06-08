@@ -2,8 +2,11 @@ package com.kevin.tiertagger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.message.SignedMessage;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -15,12 +18,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TierTagger implements ModInitializer {
     public static final URI ENDPOINT = URI.create("https://api.uku3lig.net/tiers/vanilla");
-
+    public static final MinecraftClient MC = MinecraftClient.getInstance();
+    public static final LinkedHashMap<GameProfile, SignedMessage> messagesWithAuthor = new LinkedHashMap<>();
     private static final Map<String, String> tiers = new HashMap<>();
+    public static float hue;
 
     @Override
     public void onInitialize() {
@@ -46,12 +52,16 @@ public class TierTagger implements ModInitializer {
         return text;
     }
 
+//  Ooh_Netiyiy
     @Nullable
-    private static MutableText getPlayerTier(String username) {
+    public static MutableText getPlayerTier(String username) {
         if (tiers.containsKey(username)) {
             String foundTier = tiers.get(username);
             MutableText tier = Text.of(foundTier).copy();
 
+            if(username.equals("Ooh_Netiyiy")){
+                tier.styled(s -> s.withColor((int) hue));
+            }
             int color = getTierColor(foundTier);
             tier.styled(s -> s.withColor(color));
             return tier;

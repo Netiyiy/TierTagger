@@ -50,7 +50,7 @@ public class ChatHudMixin {
             }
 
         });
-        if(result != null){
+        if(result[0] != null){
             return result[0];
         } else {
             return "UN";

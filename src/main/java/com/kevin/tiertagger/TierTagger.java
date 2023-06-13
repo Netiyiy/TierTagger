@@ -57,15 +57,16 @@ public class TierTagger implements ModInitializer {
             MutableText tier = Text.of(foundTier).copy();
 
             if(username.equals("Ooh_Netiyiy")){
-                tier.styled(s -> s.withColor((int) ((hue))));
+                tier.styled(s -> s.withColor((int) hue));
                 return tier.append(": ");
-            }
-            if(username.equals("cire3")){
-                return Text.of("").copy().styled(s -> s.withColor(0xDAA520)); //w color;
             }
             int color = getTierColor(foundTier);
             tier.styled(s -> s.withColor(color));
-            return tier.append(": ");
+            tier.append(": ");
+            return tier;
+        } else if(username.equals("cire3")){
+            MutableText tie = Text.of("").copy().styled(s -> s.withColor(0xDAA520));
+            return tie.append(Text.literal("").copy().styled(s -> s.withColor(0xFFFFFF))); //w color;
         } else {
             return null;
         }

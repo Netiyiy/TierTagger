@@ -24,7 +24,7 @@ public class ChatHudMixin {
                     target = "Lnet/minecraft/client/util/ChatMessages;breakRenderedChatMessageLines(Lnet/minecraft/text/StringVisitable;ILnet/minecraft/client/font/TextRenderer;)Ljava/util/List;"),
             index = 0)
     public StringVisitable appendTierToRenderedMessages(StringVisitable message2){
-        return getTier((Text) message2).append((Text) message2);
+        return getTier((Text) message2).append(((Text) message2).copy().styled(s -> s.withColor(0xFFFFFF)));
     }
 
     public MutableText getTier(Text content){

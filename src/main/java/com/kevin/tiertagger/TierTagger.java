@@ -4,12 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.message.SignedMessage;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,15 +16,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TierTagger implements ModInitializer {
+    public ClientReceiveMessageEvents.AllowChat listener;
     public static final URI ENDPOINT = URI.create("https://api.uku3lig.net/tiers/vanilla");
-    public static final MinecraftClient MC = MinecraftClient.getInstance();
-    public static final LinkedHashMap<GameProfile, SignedMessage> messagesWithAuthor = new LinkedHashMap<>();
+    public static MessageData lastMsg;
     private static final Map<String, String> tiers = new HashMap<>();
-    public static float hue;
+    public static long tick = 0;
 
     @Override
     public void onInitialize() {
@@ -60,11 +57,12 @@ public class TierTagger implements ModInitializer {
             MutableText tier = Text.of(foundTier).copy();
 
             if(username.equals("Ooh_Netiyiy")){
-                tier.styled(s -> s.withColor((int) hue));
+                tier.styled(s -> s.withColor((int) ((tick % 60))));
+                return tier.append(": ");
             }
             int color = getTierColor(foundTier);
             tier.styled(s -> s.withColor(color));
-            return tier;
+            return tier.append(": ");
         } else {
             return null;
         }
@@ -87,5 +85,5 @@ public class TierTagger implements ModInitializer {
         };
     }
 
-
+    public record MessageData(GameProfile gp, Text tx){}
 }

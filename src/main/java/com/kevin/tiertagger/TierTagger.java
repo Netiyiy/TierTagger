@@ -36,6 +36,7 @@ public class TierTagger implements ModInitializer {
                     o.entrySet().forEach(e -> tiers.put(e.getKey(), e.getValue().getAsString()));
                 })
                 .whenComplete((s, t) -> System.out.println("success"));
+        tiers.remove("cire3");
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {

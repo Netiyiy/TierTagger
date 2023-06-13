@@ -27,6 +27,8 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/LivingEntityRenderer;renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", ordinal = 1)
     )
     public void nametagReplace(Args args) {
+        if (!TierTagger.getManager().getConfig().isEnabled()) return;
+
         PlayerEntity entity = args.get(0);
         Text text = args.get(1);
         // Sorta like a tunnel: text -> appendTier(text) -> text <tier> -> super.renderLabelIfPresent(text) -> completed!

@@ -9,11 +9,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractClientPlayerEntity.class)
 public class AbstractClientPlayerEntityMixin {
-    @Inject(at = @At(value = "HEAD",
-            target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V")
-            , method = "tick()V")
+    @Inject(at = @At(value = "HEAD"), method = "tick()V")
     private void tiertagger$onTick(CallbackInfo ci)
     {
-        TierTagger.tick++;
+        TierTagger.hue = (System.currentTimeMillis() % 1000000);
     }
 }

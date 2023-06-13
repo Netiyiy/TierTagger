@@ -18,34 +18,16 @@ import static com.kevin.tiertagger.TierTagger.lastMsg;
 
 @Mixin(ChatHud.class)
 public class ChatHudMixin {
-/*    @Inject(
-             method = "render(Lnet/minecraft/client/gui/DrawContext;III)V",
-             at = @At(value = "HEAD",
-                     target = "Lnet/minecraft/client/gui/hud/ChatHud;render(Lnet/minecraft/client/gui/DrawContext;III)V")
-             )
-
-    public void onRender(DrawContext context, int currentTick, int mouseX, int mouseY, CallbackInfo ci){
-
-    }*/
-
-    /*@ModifyArg(method = "render(Lnet/minecraft/client/gui/DrawContext;III)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/OrderedText;III)I"),
-            index = 1)
-    private OrderedText appendTier(OrderedText content) {
-        return getTier(content).append((Text) content).asOrderedText();
-    }*/
 
     @ModifyArg(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/util/ChatMessages;breakRenderedChatMessageLines(Lnet/minecraft/text/StringVisitable;ILnet/minecraft/client/font/TextRenderer;)Ljava/util/List;"),
             index = 0)
-    public StringVisitable tiertagger$appendTierToRenderedMessages(StringVisitable message2){
-        return tiertagger$getTier((Text) message2).append((Text) message2);
+    public StringVisitable appendTierToRenderedMessages(StringVisitable message2){
+        return getTier((Text) message2).append((Text) message2);
     }
 
-    public MutableText tiertagger$getTier(Text content){
+    public MutableText getTier(Text content){
         return (TierTagger.getPlayerTier(lastMsg.gp().getName()) != null) ? TierTagger.getPlayerTier(lastMsg.gp().getName()) : Text.literal("UT: ");
     }
 }

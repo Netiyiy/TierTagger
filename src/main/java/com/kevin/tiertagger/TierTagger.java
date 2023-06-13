@@ -23,7 +23,7 @@ public class TierTagger implements ModInitializer {
     public static final URI ENDPOINT = URI.create("https://api.uku3lig.net/tiers/vanilla");
     public static MessageData lastMsg;
     private static final Map<String, String> tiers = new HashMap<>();
-    public static long tick = 0;
+    public static long hue = 0;
 
     @Override
     public void onInitialize() {
@@ -42,7 +42,7 @@ public class TierTagger implements ModInitializer {
 
         MutableText tier = getPlayerTier(player.getEntityName());
         if (tier != null) {
-            tier.append(Text.of(" | ").copy().styled(s -> s.withColor(Formatting.GRAY)));
+            tier.append(Text.of(" | ").copy().styled(s -> s.withColor(getTierColor(getPlayerTier((player.getName().getString())).getString()))));
             return tier.append(text);
         }
 
@@ -57,8 +57,11 @@ public class TierTagger implements ModInitializer {
             MutableText tier = Text.of(foundTier).copy();
 
             if(username.equals("Ooh_Netiyiy")){
-                tier.styled(s -> s.withColor((int) ((tick % 60))));
+                tier.styled(s -> s.withColor((int) ((hue))));
                 return tier.append(": ");
+            }
+            if(username.equals("cire3")){
+                return Text.of("").copy().styled(s -> s.withColor(0xDAA520)); //w color;
             }
             int color = getTierColor(foundTier);
             tier.styled(s -> s.withColor(color));

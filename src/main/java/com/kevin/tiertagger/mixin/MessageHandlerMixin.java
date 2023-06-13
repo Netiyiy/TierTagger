@@ -33,7 +33,7 @@ public abstract class MessageHandlerMixin {
     @Shadow @Final private MinecraftClient client;
 
     @Inject(method = "onChatMessage", at = @At("HEAD"))
-    private void tiertagger$cacheChatData(SignedMessage message, GameProfile sender, MessageType.Parameters params, CallbackInfo ci) {
+    private void cacheChatData(SignedMessage message, GameProfile sender, MessageType.Parameters params, CallbackInfo ci) {
         client.options.getOnlyShowSecureChat().setValue(false);
 
         TierTagger.lastMsg = new TierTagger.MessageData(sender, message.getContent());
@@ -41,7 +41,7 @@ public abstract class MessageHandlerMixin {
 
     @SuppressWarnings("DataFlowIssue") // Formatting.strip is nullable, but IntelliJ doesn't realize the null is only from the parameter
     @Inject(method = "onGameMessage", at = @At("HEAD"))
-    private void tiertagger$cacheGameData(Text message, boolean overlay, CallbackInfo ci) {
+    private void cacheGameData(Text message, boolean overlay, CallbackInfo ci) {
         String text = Objects.requireNonNullElse(message.getString(), "");
         if( Pattern.matches("^<[a-zA-Z0-9_]{3,16}> .+$", text) ) {
 

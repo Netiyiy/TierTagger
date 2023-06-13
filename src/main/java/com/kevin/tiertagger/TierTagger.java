@@ -2,6 +2,7 @@ package com.kevin.tiertagger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.kevin.tiertagger.modmenu.ModMenuEntry;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
@@ -18,14 +19,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TierTagger implements ModInitializer {
-    public static final URI ENDPOINT = URI.create("https://api.uku3lig.net/tiers/vanilla");
 
     private static final Map<String, String> tiers = new HashMap<>();
 
     @Override
     public void onInitialize() {
+        reloadTiers();
+    }
+
+    public static void reloadTiers() {
+        final URI ENDPOINT = URI.create("https://api.uku3lig.net/tiers/" + ModMenuEntry.gamemode.toString());
         final HttpClient client = HttpClient.newHttpClient();
         final HttpRequest request = HttpRequest.newBuilder(ENDPOINT).GET().build();
+        tiers.clear();
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenAccept(s -> {
@@ -58,6 +64,8 @@ public class TierTagger implements ModInitializer {
                 tier.styled(s -> s.withColor(color));
             }
             return tier;
+        } else if (ModMenuEntry.showUnranked) {
+            return Text.of("?").copy();
         } else {
             return null;
         }
@@ -79,6 +87,5 @@ public class TierTagger implements ModInitializer {
             default -> 0xD3D3D3; // DEFAULT: pale grey
         };
     }
-
 
 }

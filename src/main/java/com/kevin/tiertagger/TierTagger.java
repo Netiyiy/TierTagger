@@ -2,16 +2,13 @@ package com.kevin.tiertagger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.kevin.tiertagger.config.TierTaggerConfig;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import com.kevin.tiertagger.modmenu.ModMenuEntry;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
-import net.uku3lig.ukulib.config.ConfigManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
@@ -19,15 +16,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
-@Slf4j
 public class TierTagger implements ModInitializer {
-    @Getter
-    private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.create(TierTaggerConfig.class, "tiertagger");
-    private static final String ENDPOINT = "https://api.uku3lig.net/tiers/";
-    private static final HttpClient client = HttpClient.newHttpClient();
 
     private static final Map<String, String> tiers = new HashMap<>();
 
@@ -37,20 +28,17 @@ public class TierTagger implements ModInitializer {
     }
 
     public static void reloadTiers() {
-        URI formattedEndpoint = URI.create(ENDPOINT + manager.getConfig().getGameMode().name().toLowerCase(Locale.ROOT));
-        final HttpRequest request = HttpRequest.newBuilder(formattedEndpoint).GET().build();
-
+        final URI ENDPOINT = URI.create("https://api.uku3lig.net/tiers/" + ModMenuEntry.gamemode.toString());
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest.newBuilder(ENDPOINT).GET().build();
+        tiers.clear();
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenAccept(s -> {
                     JsonObject o = new Gson().fromJson(s, JsonObject.class);
-                    tiers.clear();
                     o.entrySet().forEach(e -> tiers.put(e.getKey(), e.getValue().getAsString()));
                 })
-                .exceptionally(t -> {
-                    log.error("Could not reload the tiers!", t);
-                    return null;
-                });
+                .whenComplete((s, t) -> System.out.println(tiers.get("Ooh_Netiyiy") + " | Ooh_Netiyiy"));
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
@@ -76,7 +64,7 @@ public class TierTagger implements ModInitializer {
                 tier.styled(s -> s.withColor(color));
             }
             return tier;
-        } else if (manager.getConfig().isShowUnranked()) {
+        } else if (ModMenuEntry.showUnranked) {
             return Text.of("?").copy();
         } else {
             return null;

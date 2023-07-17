@@ -7,14 +7,14 @@
   "authors": ["netiyiy", "uku3lig"],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/tier-tagger/icon.png",
+  "icon": "assets/TierTagger/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
       "com.kevin.tiertagger.TierTagger"
     ],
-    "ukulib": [
-      "com.kevin.tiertagger.config.UkulibIntegration"
+    "modmenu": [
+      "com.kevin.tiertagger.modmenu.ModMenuEntry"
     ]
   },
   "mixins": [
@@ -22,7 +22,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.13",
-    "minecraft": ">=1.19.4",
-    "ukulib": "^0.6.1"
+    "fabric": "*",
+    "minecraft": "1.19.4"
   }
 }

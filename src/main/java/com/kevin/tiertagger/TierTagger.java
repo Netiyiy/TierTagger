@@ -1,7 +1,6 @@
 package com.kevin.tiertagger;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.kevin.tiertagger.config.TierTaggerConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +8,6 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import net.uku3lig.ukulib.config.ConfigManager;
 import org.jetbrains.annotations.Nullable;
@@ -21,15 +19,16 @@ import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 public class TierTagger implements ModInitializer {
     @Getter
     private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.create(TierTaggerConfig.class, "tiertagger");
-    private static final String ENDPOINT = "https://api.uku3lig.net/tiers/";
+    private static final String ENDPOINT = "https://mctiers.com/api/tier/%s?count=32767";
     private static final HttpClient client = HttpClient.newHttpClient();
 
-    private static final Map<String, String> tiers = new HashMap<>();
+    private static final Map<UUID, String> tiers = new HashMap<>();
 
     @Override
     public void onInitialize() {
@@ -38,15 +37,15 @@ public class TierTagger implements ModInitializer {
 
     public static void reloadTiers() {
         String mode = manager.getConfig().getGameMode().name().toLowerCase(Locale.ROOT);
-        URI formattedEndpoint = URI.create(ENDPOINT + mode);
+        URI formattedEndpoint = URI.create(ENDPOINT.formatted(mode));
         final HttpRequest request = HttpRequest.newBuilder(formattedEndpoint).GET().build();
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenAccept(s -> {
-                    Map<String, String> o = new Gson().fromJson(s, new TypeToken<HashMap<String, String>>() {}.getType());
+                    TierList list = new Gson().fromJson(s, TierList.class);
                     tiers.clear();
-                    tiers.putAll(o);
+                    tiers.putAll(list.getTiers());
                     log.info("Reloaded {} tiers! {} loaded.", mode, tiers.size());
                 })
                 .exceptionally(t -> {
@@ -57,7 +56,7 @@ public class TierTagger implements ModInitializer {
 
     public static Text appendTier(PlayerEntity player, Text text) {
 
-        MutableText tier = getPlayerTier(player.getEntityName());
+        MutableText tier = getPlayerTier(player.getUuid());
         if (tier != null) {
             tier.append(Text.of(" | ").copy().styled(s -> s.withColor(Formatting.GRAY)));
             return tier.append(text);
@@ -67,17 +66,10 @@ public class TierTagger implements ModInitializer {
     }
 
     @Nullable
-    private static MutableText getPlayerTier(String username) {
-        if (tiers.containsKey(username)) {
-            String foundTier = tiers.get(username);
-            MutableText tier = Text.of(foundTier).copy();
-            if (username.equals("Ooh_Netiyiy")) {
-                tier.styled(s -> s.withColor(TextColor.parse("#A020F0")));
-            } else {
-                int color = getTierColor(foundTier);
-                tier.styled(s -> s.withColor(color));
-            }
-            return tier;
+    private static MutableText getPlayerTier(UUID uuid) {
+        if (tiers.containsKey(uuid)) {
+            String foundTier = tiers.get(uuid);
+            return Text.literal(foundTier).styled(s -> s.withColor(getTierColor(foundTier)));
         } else if (manager.getConfig().isShowUnranked()) {
             return Text.of("?").copy();
         } else {

@@ -1,15 +1,31 @@
-package com.kevin.tiertagger;
+package com.kevin.tiertagger.model;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonPrimitive;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
-public record TierList(List<List<List<JsonPrimitive>>> rankings, Map<String, PlayerInfo> players) {
-    public record PlayerInfo(String name, String region, int points) {
+public record TierList(List<List<List<JsonPrimitive>>> rankings, Map<String, ShortPlayerInfo> players) {
+    public record ShortPlayerInfo(String name, String region, int points) {
+    }
 
+    private static final String ENDPOINT = "https://mctiers.com/api/tier/%s?count=32767";
+
+    public static CompletableFuture<TierList> get(HttpClient client, String mode) {
+        URI formattedEndpoint = URI.create(ENDPOINT.formatted(mode));
+        final HttpRequest request = HttpRequest.newBuilder(formattedEndpoint).GET().build();
+
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenApply(s -> new Gson().fromJson(s, TierList.class));
     }
 
     public Map<UUID, String> getTiers() {

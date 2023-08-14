@@ -1,7 +1,7 @@
 package com.kevin.tiertagger;
 
-import com.google.gson.Gson;
 import com.kevin.tiertagger.config.TierTaggerConfig;
+import com.kevin.tiertagger.model.TierList;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.fabricmc.api.ModInitializer;
@@ -12,10 +12,7 @@ import net.minecraft.util.Formatting;
 import net.uku3lig.ukulib.config.ConfigManager;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -25,7 +22,6 @@ import java.util.UUID;
 public class TierTagger implements ModInitializer {
     @Getter
     private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.create(TierTaggerConfig.class, "tiertagger");
-    private static final String ENDPOINT = "https://mctiers.com/api/tier/%s?count=32767";
     private static final HttpClient client = HttpClient.newHttpClient();
 
     private static final Map<UUID, String> tiers = new HashMap<>();
@@ -37,15 +33,10 @@ public class TierTagger implements ModInitializer {
 
     public static void reloadTiers() {
         String mode = manager.getConfig().getGameMode().name().toLowerCase(Locale.ROOT);
-        URI formattedEndpoint = URI.create(ENDPOINT.formatted(mode));
-        final HttpRequest request = HttpRequest.newBuilder(formattedEndpoint).GET().build();
-
-        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .thenAccept(s -> {
-                    TierList list = new Gson().fromJson(s, TierList.class);
+        TierList.get(client, mode)
+                .thenAccept(tl -> {
                     tiers.clear();
-                    tiers.putAll(list.getTiers());
+                    tiers.putAll(tl.getTiers());
                     log.info("Reloaded {} tiers! {} loaded.", mode, tiers.size());
                 })
                 .exceptionally(t -> {

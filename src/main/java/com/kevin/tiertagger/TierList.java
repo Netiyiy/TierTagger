@@ -29,6 +29,8 @@ public record TierList(List<List<List<JsonPrimitive>>> rankings, Map<String, Pla
     }
 
     private static UUID uuid(String s) {
-        return UUID.fromString(s.replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
+        long mostSig = Long.parseUnsignedLong(s.substring(0, 16), 16);
+        long leastSig = Long.parseUnsignedLong(s.substring(16), 16);
+        return new UUID(mostSig, leastSig);
     }
 }

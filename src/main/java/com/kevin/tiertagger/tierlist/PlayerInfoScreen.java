@@ -90,9 +90,9 @@ public class PlayerInfoScreen extends Screen {
             context.drawTextWithShadow(this.textRenderer, "Rankings:", this.width / 2 + 5, startY + 45, 0xFFFFFF);
 
             int rankingY = startY + infoHeight;
-            for (Map.Entry<String, PlayerInfo.Ranking> entry : this.info.rankings().entrySet()) {
-                String mode = entry.getKey();
-                PlayerInfo.Ranking ranking = entry.getValue();
+            for (PlayerInfo.NamedRanking namedRanking : this.info.getSortedTiers()) {
+                String mode = namedRanking.name();
+                PlayerInfo.Ranking ranking = namedRanking.ranking();
 
                 context.drawTextWithShadow(this.textRenderer, formatTier(mode, ranking), this.width / 2 + 5, rankingY, 0xFFFFFF);
                 rankingY += 10;
@@ -211,6 +211,7 @@ public class PlayerInfoScreen extends Screen {
             color = tier.pos() == 0 ? 0x3e71f4 : 0x80b5ff;
         }
 
+        // TODO add peak tier
         Text tierText = Text.literal(text.toString()).styled(s -> s.withColor(color));
 
         return Text.empty()

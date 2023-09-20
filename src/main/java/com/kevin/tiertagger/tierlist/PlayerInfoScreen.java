@@ -14,6 +14,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -200,23 +201,32 @@ public class PlayerInfoScreen extends Screen {
     }
 
     private Text formatTier(String mode, PlayerInfo.Ranking tier) {
-        StringBuilder text = new StringBuilder();
-        if (tier.retired()) text.append("R");
-        text.append(tier.pos() == 0 ? "H" : "L").append("T").append(tier.tier());
+        MutableText tierText = getTierText(tier.tier(), tier.pos(), tier.retired());
 
-        int color;
-        if (tier.retired()) {
-            color = 0xa177ff;
-        } else {
-            color = tier.pos() == 0 ? 0x3e71f4 : 0x80b5ff;
+        if (tier.peak_tier() != null && tier.peak_pos() != null && tier.peak_tier() <= tier.tier() && tier.peak_pos() < tier.pos()) {
+            tierText = tierText.append(Text.literal(" (peak: ").styled(s -> s.withColor(Formatting.GRAY)))
+                    .append(getTierText(tier.peak_tier(), tier.peak_pos(), tier.retired()))
+                    .append(Text.literal(")").styled(s -> s.withColor(Formatting.GRAY)));
         }
-
-        // TODO add peak tier
-        Text tierText = Text.literal(text.toString()).styled(s -> s.withColor(color));
 
         return Text.empty()
                 .append(Text.literal(MODE_NAMES.getOrDefault(mode, mode) + ": ").styled(s -> s.withColor(Formatting.GRAY)))
                 .append(tierText);
+    }
+
+    private MutableText getTierText(int tier, int pos, boolean retired) {
+        StringBuilder text = new StringBuilder();
+        if (retired) text.append("R");
+        text.append(pos == 0 ? "H" : "L").append("T").append(tier);
+
+        int color;
+        if (retired) {
+            color = 0xa177ff;
+        } else {
+            color = pos == 0 ? 0x3e71f4 : 0x80b5ff;
+        }
+
+        return Text.literal(text.toString()).styled(s -> s.withColor(color));
     }
 
     private Text getRegionText(PlayerInfo info) {

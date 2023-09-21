@@ -39,8 +39,6 @@ public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings
         URI formattedEndpoint = URI.create(ENDPOINT.formatted(uuidStr(uuid)));
         final HttpRequest request = HttpRequest.newBuilder(formattedEndpoint).GET().build();
 
-        System.out.println("sending request to " + formattedEndpoint);
-
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));

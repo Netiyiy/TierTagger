@@ -19,6 +19,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.uku3lig.ukulib.config.screen.CloseableScreen;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +33,7 @@ import java.util.concurrent.CompletionException;
 
 @Slf4j
 @Setter
-public class PlayerInfoScreen extends Screen {
+public class PlayerInfoScreen extends CloseableScreen {
     private static final Map<String, UUID> uuidCache = new HashMap<>();
 
     private static final Map<String, String> MODE_NAMES = Map.of(
@@ -45,17 +46,13 @@ public class PlayerInfoScreen extends Screen {
             "axe", "\uD83E\uDE93 Axe"
     );
 
-    private final Screen parent;
-
     private String player;
     private Identifier texture;
     private PlayerInfo info;
 
-    public PlayerInfoScreen(Screen parent, String player, PlayerInfo info) {
-        super(Text.of("Player Info"));
-        this.parent = parent;
+    public PlayerInfoScreen(Screen parent, String player) {
+        super(Text.of("Player Info"), parent);
         this.player = player;
-        this.info = info;
     }
 
     @Override
@@ -76,7 +73,6 @@ public class PlayerInfoScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
 
         context.drawCenteredTextWithShadow(this.textRenderer, this.player + "'s profile", this.width / 2, 20, 0xFFFFFF);
@@ -107,8 +103,8 @@ public class PlayerInfoScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(DrawContext context) {
-        super.renderBackground(context);
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.renderBackground(context, mouseX, mouseY, delta);
 
         if (MinecraftClient.getInstance().world == null) {
             context.setShaderColor(0.125F, 0.125F, 0.125F, 1.0F);
@@ -132,11 +128,6 @@ public class PlayerInfoScreen extends Screen {
             context.fillGradient(RenderLayer.getGuiOverlay(), 0, 32, this.width, 32 + 4, -16777216, 0, 0);
             context.fillGradient(RenderLayer.getGuiOverlay(), 0, this.height - 32 - 4, this.width, this.height - 32, 0, -16777216, 0);
         }
-    }
-
-    @Override
-    public void close() {
-        if (this.client != null) this.client.setScreen(parent);
     }
 
     private boolean textureExists(Identifier texture) {

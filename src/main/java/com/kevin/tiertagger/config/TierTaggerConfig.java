@@ -4,19 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.uku3lig.ukulib.config.IConfig;
+
+import java.io.Serializable;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TierTaggerConfig implements IConfig<TierTaggerConfig> {
+public class TierTaggerConfig implements Serializable {
     private boolean enabled = true;
     private GameMode gameMode = GameMode.VANILLA;
     private boolean showUnranked = false;
-
-    @Override
-    public TierTaggerConfig defaultConfig() {
-        return new TierTaggerConfig();
-    }
 }

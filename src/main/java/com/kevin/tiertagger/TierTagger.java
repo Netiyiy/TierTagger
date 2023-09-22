@@ -21,7 +21,7 @@ import java.util.UUID;
 @Slf4j
 public class TierTagger implements ModInitializer {
     @Getter
-    private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.create(TierTaggerConfig.class, "tiertagger");
+    private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.createDefault(TierTaggerConfig.class, "tiertagger");
     @Getter
     private static final HttpClient client = HttpClient.newHttpClient();
 

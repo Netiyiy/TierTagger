@@ -2,29 +2,24 @@ package com.kevin.tiertagger.config;
 
 import com.kevin.tiertagger.TierTagger;
 import com.kevin.tiertagger.tierlist.PlayerSearchScreen;
-import com.mojang.serialization.Codec;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.text.Text;
+import net.uku3lig.ukulib.config.option.CyclingOption;
+import net.uku3lig.ukulib.config.option.ScreenOpenButton;
+import net.uku3lig.ukulib.config.option.WidgetCreator;
 import net.uku3lig.ukulib.config.screen.AbstractConfigScreen;
-import net.uku3lig.ukulib.utils.Ukutils;
-
-import java.util.Arrays;
 
 public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
     public TTConfigScreen(Screen parent) {
-        super(parent, Text.of("TierTagger Config"), TierTagger.getManager());
+        super("TierTagger Config", parent, TierTagger.getManager());
     }
 
     @Override
-    protected SimpleOption<?>[] getOptions(TierTaggerConfig config) {
-        return new SimpleOption[] {
-                SimpleOption.ofBoolean("tiertagger.config.enabled", config.isEnabled(), config::setEnabled),
-                new SimpleOption<>("tiertagger.config.gamemode", SimpleOption.emptyTooltip(), SimpleOption.enumValueText(),
-                        new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(GameMode.values()), Codec.INT.xmap(GameMode::byId, GameMode::getId)),
-                        config.getGameMode(), config::setGameMode),
-                SimpleOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
-                Ukutils.createOpenButton("tiertagger.config.search", PlayerSearchScreen::new),
+    protected WidgetCreator[] getWidgets(TierTaggerConfig config) {
+        return new WidgetCreator[] {
+                CyclingOption.ofBoolean("tiertagger.config.enabled", config.isEnabled(), config::setEnabled),
+                CyclingOption.ofTranslatableEnum("tiertagger.config.gamemode", GameMode.class, config.getGameMode(), config::setGameMode),
+                CyclingOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
+                new ScreenOpenButton("tiertagger.config.search", PlayerSearchScreen::new)
         };
     }
 

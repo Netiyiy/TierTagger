@@ -2,6 +2,7 @@ package com.kevin.tiertagger.model;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonPrimitive;
+import lombok.Data;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -13,8 +14,16 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public record TierList(List<List<List<JsonPrimitive>>> rankings, Map<String, ShortPlayerInfo> players) {
-    public record ShortPlayerInfo(String name, String region, int points) {
+@Data
+public class TierList {
+    private List<List<List<JsonPrimitive>>> rankings;
+    private Map<String, ShortPlayerInfo> players;
+
+    @Data
+    public static class ShortPlayerInfo {
+        private String name;
+        private String region;
+        private int points;
     }
 
     private static final String ENDPOINT = "https://mctiers.com/api/tier/%s?count=32767";

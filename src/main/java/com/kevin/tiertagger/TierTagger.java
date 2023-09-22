@@ -22,6 +22,7 @@ import java.util.UUID;
 public class TierTagger implements ModInitializer {
     @Getter
     private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.create(TierTaggerConfig.class, "tiertagger");
+    @Getter
     private static final HttpClient client = HttpClient.newHttpClient();
 
     private static final Map<UUID, String> tiers = new HashMap<>();

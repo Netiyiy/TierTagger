@@ -1,5 +1,8 @@
 {
   "tiertagger.config.enabled": "Enabled",
   "tiertagger.config.gamemode": "Gamemode",
-  "tiertagger.config.unranked": "Show Unranked"
+  "tiertagger.config.unranked": "Show Unranked",
+  "tiertagger.config.search": "Search Player",
+  "tiertagger.search": "Search",
+  "tiertagger.search.user": "Username"
 }

@@ -1,7 +1,7 @@
 package com.kevin.tiertagger.config;
 
-import com.kevin.tiertagger.tierlist.PlayerInfoScreen;
 import com.kevin.tiertagger.TierTagger;
+import com.kevin.tiertagger.tierlist.PlayerSearchScreen;
 import com.mojang.serialization.Codec;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.SimpleOption;
@@ -24,7 +24,7 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
                         new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(GameMode.values()), Codec.INT.xmap(GameMode::byId, GameMode::getId)),
                         config.getGameMode(), config::setGameMode),
                 SimpleOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
-                Ukutils.createOpenButton("h", p -> new PlayerInfoScreen(p, "Marlowww")),
+                Ukutils.createOpenButton("tiertagger.config.search", PlayerSearchScreen::new),
         };
     }
 

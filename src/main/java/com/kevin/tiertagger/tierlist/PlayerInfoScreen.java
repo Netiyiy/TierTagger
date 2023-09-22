@@ -2,6 +2,7 @@ package com.kevin.tiertagger.tierlist;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.kevin.tiertagger.TierTagger;
 import com.kevin.tiertagger.model.PlayerInfo;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
@@ -33,7 +33,6 @@ import java.util.concurrent.CompletionException;
 @Slf4j
 @Setter
 public class PlayerInfoScreen extends Screen {
-    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
     private static final Map<String, UUID> uuidCache = new HashMap<>();
 
     private static final Map<String, String> MODE_NAMES = Map.of(
@@ -52,10 +51,11 @@ public class PlayerInfoScreen extends Screen {
     private Identifier texture;
     private PlayerInfo info;
 
-    public PlayerInfoScreen(Screen parent, String player) {
+    public PlayerInfoScreen(Screen parent, String player, PlayerInfo info) {
         super(Text.of("Player Info"));
         this.parent = parent;
         this.player = player;
+        this.info = info;
     }
 
     @Override
@@ -64,11 +64,14 @@ public class PlayerInfoScreen extends Screen {
                 .dimensions(this.width / 2 - 100, this.height - 27, 200, 20)
                 .build());
 
-        this.fetchTexture(player).thenAccept(this::setTexture);
-        this.fetchUUID(player).thenCompose(u -> PlayerInfo.get(HTTP_CLIENT, u)).thenAccept(this::setInfo).exceptionally(t -> {
-            log.error("Could not fetch player info", t);
-            return null;
-        });
+        this.fetchTexture(this.player).thenAccept(this::setTexture);
+
+        if (this.info == null) {
+            fetchUUID(player).thenCompose(u -> PlayerInfo.get(TierTagger.getClient(), u)).thenAccept(this::setInfo).exceptionally(t -> {
+                log.error("Could not fetch player info", t);
+                return null;
+            });
+        }
     }
 
     @Override
@@ -146,7 +149,7 @@ public class PlayerInfoScreen extends Screen {
 
         if (textureExists(tex)) return CompletableFuture.completedFuture(tex);
 
-        return this.fetchUUID(username)
+        return fetchUUID(username)
                 .thenApply(uuid -> {
                     TextureManager texManager = MinecraftClient.getInstance().getTextureManager();
 
@@ -164,7 +167,7 @@ public class PlayerInfoScreen extends Screen {
                 });
     }
 
-    private CompletableFuture<UUID> fetchUUID(String user) {
+    public static CompletableFuture<UUID> fetchUUID(String user) {
         String username = user.toLowerCase();
 
         if (uuidCache.containsKey(username)) {
@@ -174,7 +177,7 @@ public class PlayerInfoScreen extends Screen {
         HttpRequest uuidReq = HttpRequest.newBuilder(URI.create("https://api.mojang.com/users/profiles/minecraft/" + username))
                 .GET().build();
 
-        return HTTP_CLIENT.sendAsync(uuidReq, HttpResponse.BodyHandlers.ofString())
+        return TierTagger.getClient().sendAsync(uuidReq, HttpResponse.BodyHandlers.ofString())
                 .thenApply(res -> {
                     if (res.statusCode() != 200) {
                         log.error("Error while getting UUID of " + username + ": " + res.statusCode() + " " + res.body());
@@ -184,13 +187,13 @@ public class PlayerInfoScreen extends Screen {
                     JsonObject json = new Gson().fromJson(res.body(), JsonObject.class);
                     String uuid = json.get("id").getAsString();
 
-                    this.uuid(uuid).ifPresent(u -> uuidCache.put(username, u));
+                    uuid(uuid).ifPresent(u -> uuidCache.put(username, u));
 
                     return uuidCache.get(username);
                 });
     }
 
-    private Optional<UUID> uuid(String u) {
+    private static Optional<UUID> uuid(String u) {
         try {
             long most = Long.parseUnsignedLong(u.substring(0, 16), 16);
             long least = Long.parseUnsignedLong(u.substring(16), 16);

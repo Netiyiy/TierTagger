@@ -3,9 +3,10 @@ package com.kevin.tiertagger.config;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.util.TranslatableOption;
-import net.minecraft.util.function.ValueLists;
+import net.minecraft.util.math.MathHelper;
 
-import java.util.function.IntFunction;
+import java.util.Arrays;
+import java.util.Comparator;
 
 @AllArgsConstructor
 @Getter
@@ -19,12 +20,12 @@ public enum GameMode implements TranslatableOption {
     SMP(6, "SMP"),
     ;
 
-    private static final IntFunction<GameMode> GETTER = ValueLists.createIdToValueFunction(GameMode::getId, values(), ValueLists.OutOfBoundsHandling.WRAP);
+    private static final GameMode[] VALUES = Arrays.stream(values()).sorted(Comparator.comparingInt(GameMode::getId)).toArray(GameMode[]::new);
 
     private final int id;
     private final String translationKey;
 
     public static GameMode byId(int id) {
-        return GETTER.apply(id);
+        return VALUES[MathHelper.floorMod(id, VALUES.length)];
     }
 }

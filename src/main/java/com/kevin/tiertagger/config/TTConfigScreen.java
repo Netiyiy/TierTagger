@@ -1,13 +1,12 @@
 package com.kevin.tiertagger.config;
 
 import com.kevin.tiertagger.TierTagger;
-import com.mojang.serialization.Codec;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.option.SimpleOption;
+import net.minecraft.client.option.CyclingOption;
+import net.minecraft.client.option.Option;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.uku3lig.ukulib.config.screen.AbstractConfigScreen;
-
-import java.util.Arrays;
 
 public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
     public TTConfigScreen(Screen parent) {
@@ -15,13 +14,12 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
     }
 
     @Override
-    protected SimpleOption<?>[] getOptions(TierTaggerConfig config) {
-        return new SimpleOption[] {
-                SimpleOption.ofBoolean("tiertagger.config.enabled", config.isEnabled(), config::setEnabled),
-                new SimpleOption<>("tiertagger.config.gamemode", SimpleOption.emptyTooltip(), SimpleOption.enumValueText(),
-                        new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(GameMode.values()), Codec.INT.xmap(GameMode::byId, GameMode::getId)),
-                        config.getGameMode(), config::setGameMode),
-                SimpleOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
+    protected Option[] getOptions(TierTaggerConfig config) {
+        return new Option[] {
+                CyclingOption.create("tiertagger.config.enabled", opt -> config.isEnabled(), (opt, option, b) -> config.setEnabled(b)),
+                CyclingOption.create("tiertagger.config.gamemode", GameMode.values(), m -> new TranslatableText(m.getTranslationKey()),
+                        opt -> config.getGameMode(), (opt, option, gameMode) -> config.setGameMode(gameMode)),
+                CyclingOption.create("tiertagger.config.unranked", opt -> config.isShowUnranked(), (opt, option, b) -> config.setShowUnranked(b)),
         };
     }
 

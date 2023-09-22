@@ -2,7 +2,6 @@ package com.kevin.tiertagger.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.util.TranslatableOption;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.Arrays;
@@ -10,7 +9,7 @@ import java.util.Comparator;
 
 @AllArgsConstructor
 @Getter
-public enum GameMode implements TranslatableOption {
+public enum GameMode {
     SWORD(0, "Sword"),
     VANILLA(1, "Vanilla"),
     AXE(2, "Axe"),

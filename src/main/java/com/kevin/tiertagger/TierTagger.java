@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -60,7 +61,7 @@ public class TierTagger implements ModInitializer {
     private static MutableText getPlayerTier(UUID uuid) {
         if (tiers.containsKey(uuid)) {
             String foundTier = tiers.get(uuid);
-            return Text.literal(foundTier).styled(s -> s.withColor(getTierColor(foundTier)));
+            return new LiteralText(foundTier).styled(s -> s.withColor(getTierColor(foundTier)));
         } else if (manager.getConfig().isShowUnranked()) {
             return Text.of("?").copy();
         } else {

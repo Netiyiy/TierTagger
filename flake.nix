@@ -30,6 +30,7 @@
               flite
               libpulseaudio
               udev
+              xorg.libXcursor
             ];
         };
 

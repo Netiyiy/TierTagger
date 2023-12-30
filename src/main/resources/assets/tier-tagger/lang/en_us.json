@@ -4,5 +4,6 @@
   "tiertagger.config.unranked": "Show Unranked",
   "tiertagger.config.search": "Search Player",
   "tiertagger.search": "Search",
-  "tiertagger.search.user": "Username"
+  "tiertagger.search.user": "Username",
+  "tiertagger.clear": "Clear Tiers Cache"
 }

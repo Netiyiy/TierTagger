@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
+import com.kevin.tiertagger.TierTagger;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,7 +15,8 @@ import java.util.concurrent.CompletableFuture;
 
 public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings, String region, int points,
                          int overall, List<Badge> badges) {
-    public record Ranking(int tier, int pos, @Nullable Integer peak_tier, @Nullable Integer peak_pos, long attained, boolean retired) {
+    public record Ranking(int tier, int pos, @Nullable Integer peak_tier, @Nullable Integer peak_pos, long attained,
+                          boolean retired) {
     }
 
     public record NamedRanking(String name, Ranking ranking) {
@@ -33,11 +35,9 @@ public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings
             "AF", 0x674ea7
     );
 
-    private static final String ENDPOINT = "https://mctiers.com/api/profile/%s";
-
     public static CompletableFuture<PlayerInfo> get(HttpClient client, UUID uuid) {
-        URI formattedEndpoint = URI.create(ENDPOINT.formatted(uuidStr(uuid)));
-        final HttpRequest request = HttpRequest.newBuilder(formattedEndpoint).GET().build();
+        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuidStr(uuid);
+        final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)

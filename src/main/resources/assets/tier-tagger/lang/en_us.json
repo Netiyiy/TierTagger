@@ -2,8 +2,11 @@
   "tiertagger.config.enabled": "Enabled",
   "tiertagger.config.gamemode": "Gamemode",
   "tiertagger.config.unranked": "Show Unranked",
+  "tiertagger.config.statistic": "Shown Statistic",
   "tiertagger.config.search": "Search Player",
   "tiertagger.search": "Search",
   "tiertagger.search.user": "Username",
-  "tiertagger.clear": "Clear Tiers Cache"
+  "tiertagger.clear": "Clear Tiers Cache",
+  "tiertagger.stat.tier": "Tier",
+  "tiertagger.stat.rank": "Rank"
 }

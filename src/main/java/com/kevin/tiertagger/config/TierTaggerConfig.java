@@ -16,4 +16,5 @@ public class TierTaggerConfig implements Serializable {
     private boolean enabled = true;
     private GameMode gameMode = GameMode.VANILLA;
     private boolean showUnranked = false;
+    private Statistic shownStatistic = Statistic.TIER;
 }

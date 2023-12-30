@@ -1,5 +1,6 @@
 {
   "tiertagger.config.enabled": "Enabled",
   "tiertagger.config.gamemode": "Gamemode",
-  "tiertagger.config.unranked": "Show Unranked"
+  "tiertagger.config.unranked": "Show Unranked",
+  "tiertagger.clear": "Clear Tiers Cache"
 }

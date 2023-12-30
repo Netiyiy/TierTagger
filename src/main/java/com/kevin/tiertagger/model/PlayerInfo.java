@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public record PlayerInfo(Map<String, Ranking> rankings) {
+public record PlayerInfo(Map<String, Ranking> rankings, int overall) {
     public record Ranking(int tier, int pos) {
     }
 

@@ -1,6 +1,7 @@
 package com.kevin.tiertagger.model;
 
 import com.google.gson.Gson;
+import com.kevin.tiertagger.TierTagger;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -16,8 +17,6 @@ import java.util.concurrent.CompletableFuture;
 @Data
 @SuppressWarnings("ClassCanBeRecord") // records don't work with the current version of gson
 public final class PlayerInfo {
-    private static final String ENDPOINT = "https://mctiers.com/api/profile/%s";
-
     // other fields stripped out for conciseness
     private final Map<String, Ranking> rankings;
 
@@ -28,8 +27,8 @@ public final class PlayerInfo {
     }
 
     public static CompletableFuture<PlayerInfo> get(HttpClient client, UUID uuid) {
-        URI formattedEndpoint = URI.create(ENDPOINT.formatted(uuidStr(uuid)));
-        final HttpRequest request = HttpRequest.newBuilder(formattedEndpoint).GET().build();
+        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuidStr(uuid);
+        final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)

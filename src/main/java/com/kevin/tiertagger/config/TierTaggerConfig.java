@@ -12,6 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TierTaggerConfig implements Serializable {
+    private String apiUrl = "https://mctiers.com/api";
     private boolean enabled = true;
     private GameMode gameMode = GameMode.VANILLA;
     private boolean showUnranked = false;

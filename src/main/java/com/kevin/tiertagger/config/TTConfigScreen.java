@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.text.Text;
 import net.uku3lig.ukulib.config.screen.AbstractConfigScreen;
+import net.uku3lig.ukulib.utils.Ukutils;
 
 import java.util.Arrays;
 
@@ -22,12 +23,7 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
                         new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(GameMode.values()), Codec.INT.xmap(GameMode::byId, GameMode::getId)),
                         config.getGameMode(), config::setGameMode),
                 SimpleOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
+                Ukutils.createButton("tiertagger.clear", s -> TierTagger.clearCache()),
         };
-    }
-
-    @Override
-    public void removed() {
-        super.removed();
-        TierTagger.reloadTiers();
     }
 }

@@ -7,6 +7,7 @@ import net.minecraft.client.option.Option;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.uku3lig.ukulib.config.screen.AbstractConfigScreen;
+import net.uku3lig.ukulib.utils.Ukutils;
 
 public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
     public TTConfigScreen(Screen parent) {
@@ -20,12 +21,7 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
                 CyclingOption.create("tiertagger.config.gamemode", GameMode.values(), m -> new TranslatableText(m.getTranslationKey()),
                         opt -> config.getGameMode(), (opt, option, gameMode) -> config.setGameMode(gameMode)),
                 CyclingOption.create("tiertagger.config.unranked", opt -> config.isShowUnranked(), (opt, option, b) -> config.setShowUnranked(b)),
+                Ukutils.createButton("tiertagger.clear", s -> TierTagger.clearCache()),
         };
-    }
-
-    @Override
-    public void removed() {
-        super.removed();
-        TierTagger.reloadTiers();
     }
 }

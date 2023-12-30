@@ -1,7 +1,7 @@
 package com.kevin.tiertagger;
 
 import com.kevin.tiertagger.config.TierTaggerConfig;
-import com.kevin.tiertagger.model.TierList;
+import com.kevin.tiertagger.model.PlayerInfo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.fabricmc.api.ModInitializer;
@@ -13,10 +13,7 @@ import net.uku3lig.ukulib.config.ConfigManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.http.HttpClient;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 public class TierTagger implements ModInitializer {
@@ -25,30 +22,15 @@ public class TierTagger implements ModInitializer {
     @Getter
     private static final HttpClient client = HttpClient.newHttpClient();
 
-    private static final Map<UUID, String> tiers = new HashMap<>();
+    private static final Map<UUID, Optional<PlayerInfo>> tiers = new HashMap<>();
 
     @Override
     public void onInitialize() {
-        reloadTiers();
-    }
-
-    public static void reloadTiers() {
-        String mode = manager.getConfig().getGameMode().name().toLowerCase(Locale.ROOT);
-        TierList.get(client, mode)
-                .thenAccept(tl -> {
-                    tiers.clear();
-                    tiers.putAll(tl.getTiers());
-                    log.info("Reloaded {} tiers! {} loaded.", mode, tiers.size());
-                })
-                .exceptionally(t -> {
-                    log.error("Could not reload the tiers!", t);
-                    return null;
-                });
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
-
         MutableText tier = getPlayerTier(player.getUuid());
+
         if (tier != null) {
             tier.append(Text.of(" | ").copy().styled(s -> s.withColor(Formatting.GRAY)));
             return tier.append(text);
@@ -60,17 +42,24 @@ public class TierTagger implements ModInitializer {
     @Nullable
     private static MutableText getPlayerTier(UUID uuid) {
         if (tiers.containsKey(uuid)) {
-            String foundTier = tiers.get(uuid);
-            return Text.literal(foundTier).styled(s -> s.withColor(getTierColor(foundTier)));
-        } else if (manager.getConfig().isShowUnranked()) {
-            return Text.of("?").copy();
+            String mode = manager.getConfig().getGameMode().getApiKey();
+            Optional<PlayerInfo.Ranking> ranking = tiers.get(uuid).map(PlayerInfo::rankings).map(m -> m.get(mode));
+
+            // empty optional means we are still fetching it, to avoid calling the api each frame :3
+            // prevents EXTREMELY ABUSIVE behavior that would cause the servers to be overloaded 24/7
+            if (ranking.isPresent()) {
+                String tier = (ranking.get().pos() == 0 ? "H" : "L") + "T" + ranking.get().tier();
+                return Text.literal(tier).styled(s -> s.withColor(getTierColor(tier)));
+            }
         } else {
-            return null;
+            tiers.put(uuid, Optional.empty());
+            PlayerInfo.get(client, uuid).thenAccept(info -> tiers.put(uuid, Optional.ofNullable(info)));
         }
+
+        return null;
     }
 
     private static int getTierColor(String tier) {
-
         return switch (tier) {
             case "HT1" -> 0xFF0000; // red
             case "LT1" -> 0xFFB6C1; // light pink
@@ -84,6 +73,10 @@ public class TierTagger implements ModInitializer {
             case "LT5" -> 0xD3D3D3; // pale grey
             default -> 0xD3D3D3; // DEFAULT: pale grey
         };
+    }
+
+    public static void clearCache() {
+        tiers.clear();
     }
 
 }

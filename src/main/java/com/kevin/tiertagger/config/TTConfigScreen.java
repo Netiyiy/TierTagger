@@ -24,13 +24,8 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
                         new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(GameMode.values()), Codec.INT.xmap(GameMode::byId, GameMode::getId)),
                         config.getGameMode(), config::setGameMode),
                 SimpleOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
+                Ukutils.createButton("tiertagger.clear", s -> TierTagger.clearCache()),
                 Ukutils.createOpenButton("tiertagger.config.search", PlayerSearchScreen::new),
         };
-    }
-
-    @Override
-    public void removed() {
-        super.removed();
-        TierTagger.reloadTiers();
     }
 }

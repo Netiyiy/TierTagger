@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 public final class PlayerInfo {
     // other fields stripped out for conciseness
     private final Map<String, Ranking> rankings;
+    private final int overall;
 
     @Data
     public static final class Ranking {

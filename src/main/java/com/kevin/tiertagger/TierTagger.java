@@ -28,34 +28,37 @@ public class TierTagger implements ModInitializer {
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
-        MutableText tier = getPlayerTier(player.getUuid());
+        MutableText following = switch (manager.getConfig().getShownStatistic()) {
+            case TIER -> getPlayerTier(player.getUuid());
+            case RANK -> getPlayerInfo(player.getUuid())
+                    .map(i -> Text.literal("#" + i.getOverall()))
+                    .orElse(null);
+        };
 
-        if (tier != null) {
-            tier.append(Text.of(" | ").copy().styled(s -> s.withColor(Formatting.GRAY)));
-            return tier.append(text);
+        if (following != null) {
+            following.append(Text.literal(" | ").formatted(Formatting.GRAY));
+            return following.append(text);
         }
 
         return text;
     }
 
+    private static Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
+        return tiers.computeIfAbsent(uuid, u -> {
+            PlayerInfo.get(client, uuid).thenAccept(info -> tiers.put(uuid, Optional.ofNullable(info)));
+            return Optional.empty();
+        });
+    }
+
     @Nullable
     private static MutableText getPlayerTier(UUID uuid) {
-        if (tiers.containsKey(uuid)) {
-            String mode = manager.getConfig().getGameMode().getApiKey();
-            Optional<PlayerInfo.Ranking> ranking = tiers.get(uuid).map(PlayerInfo::getRankings).map(m -> m.get(mode));
+        String mode = manager.getConfig().getGameMode().getApiKey();
 
-            // empty optional means we are still fetching it, to avoid calling the api each frame :3
-            // prevents EXTREMELY ABUSIVE behavior that would cause the servers to be overloaded 24/7
-            if (ranking.isPresent()) {
-                String tier = (ranking.get().getPos() == 0 ? "H" : "L") + "T" + ranking.get().getTier();
-                return Text.literal(tier).styled(s -> s.withColor(getTierColor(tier)));
-            }
-        } else {
-            tiers.put(uuid, Optional.empty());
-            PlayerInfo.get(client, uuid).thenAccept(info -> tiers.put(uuid, Optional.ofNullable(info)));
-        }
-
-        return null;
+        return getPlayerInfo(uuid)
+                .map(i -> i.getRankings().get(mode))
+                .map(r -> (r.getPos() == 0 ? "H" : "L") + "T" + r.getTier())
+                .map(t -> Text.literal(t).styled(s -> s.withColor(getTierColor(t))))
+                .orElse(null);
     }
 
     private static int getTierColor(String tier) {

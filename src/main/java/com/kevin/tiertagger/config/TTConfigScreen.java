@@ -1,5 +1,6 @@
 package com.kevin.tiertagger.config;
 
+import com.kevin.tiertagger.TierCache;
 import com.kevin.tiertagger.TierTagger;
 import com.kevin.tiertagger.tierlist.PlayerSearchScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,7 +23,7 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
                 CyclingOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
                 CyclingOption.ofBoolean("tiertagger.config.retired", config.isShowRetired(), config::setShowRetired),
                 CyclingOption.ofTranslatableEnum("tiertagger.config.statistic", Statistic.class, config.getShownStatistic(), config::setShownStatistic),
-                new SimpleButton("tiertagger.clear", b -> TierTagger.clearCache()),
+                new SimpleButton("tiertagger.clear", b -> TierCache.clearCache()),
                 new ScreenOpenButton("tiertagger.config.search", PlayerSearchScreen::new)
         };
     }

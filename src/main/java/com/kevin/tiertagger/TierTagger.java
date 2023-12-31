@@ -1,7 +1,6 @@
 package com.kevin.tiertagger;
 
 import com.kevin.tiertagger.config.TierTaggerConfig;
-import com.kevin.tiertagger.model.PlayerInfo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.fabricmc.api.ModInitializer;
@@ -13,27 +12,23 @@ import net.minecraft.util.Formatting;
 import net.uku3lig.ukulib.config.ConfigManager;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.http.HttpClient;
-import java.util.*;
+import java.util.UUID;
 
 @Slf4j
 public class TierTagger implements ModInitializer {
     @Getter
     private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.create(TierTaggerConfig.class, "tiertagger");
-    private static final HttpClient client = HttpClient.newHttpClient();
-
-    private static final Map<UUID, Optional<PlayerInfo>> tiers = new HashMap<>();
 
     @Override
     public void onInitialize() {
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
-        MutableText tier = getPlayerTier(player.getUuid());
+        MutableText following = getPlayerTier(player.getUuid());
 
-        if (tier != null) {
-            tier.append(Text.of(" | ").copy().styled(s -> s.withColor(Formatting.GRAY)));
-            return tier.append(text);
+        if (following != null) {
+            following.append(new LiteralText(" | ").formatted(Formatting.GRAY));
+            return following.append(text);
         }
 
         return text;
@@ -41,25 +36,20 @@ public class TierTagger implements ModInitializer {
 
     @Nullable
     private static MutableText getPlayerTier(UUID uuid) {
-        if (tiers.containsKey(uuid)) {
-            String mode = manager.getConfig().getGameMode().getApiKey();
-            Optional<PlayerInfo.Ranking> ranking = tiers.get(uuid).map(PlayerInfo::getRankings).map(m -> m.get(mode));
+        String mode = manager.getConfig().getGameMode().getApiKey();
 
-            // empty optional means we are still fetching it, to avoid calling the api each frame :3
-            // prevents EXTREMELY ABUSIVE behavior that would cause the servers to be overloaded 24/7
-            if (ranking.isPresent()) {
-                String tier = (ranking.get().getPos() == 0 ? "H" : "L") + "T" + ranking.get().getTier();
-                return new LiteralText(tier).styled(s -> s.withColor(getTierColor(tier)));
-            }
-        } else {
-            tiers.put(uuid, Optional.empty());
-            PlayerInfo.get(client, uuid).thenAccept(info -> tiers.put(uuid, Optional.ofNullable(info)));
-        }
-
-        return null;
+        return TierCache.getPlayerInfo(uuid)
+                .map(i -> i.getRankings().get(mode))
+                .map(r -> (r.getPos() == 0 ? "H" : "L") + "T" + r.getTier())
+                .map(t -> new LiteralText(t).styled(s -> s.withColor(getTierColor(t))))
+                .orElse(null);
     }
 
     private static int getTierColor(String tier) {
+        if (tier.startsWith("R")) {
+            return 0x662B99; // ourple
+        }
+
         return switch (tier) {
             case "HT1" -> 0xFF0000; // red
             case "LT1" -> 0xFFB6C1; // light pink
@@ -74,9 +64,4 @@ public class TierTagger implements ModInitializer {
             default -> 0xD3D3D3; // DEFAULT: pale grey
         };
     }
-
-    public static void clearCache() {
-        tiers.clear();
-    }
-
 }

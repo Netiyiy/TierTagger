@@ -41,9 +41,14 @@ public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings
         String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuid.toString().replace("-", "");
         final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
 
-        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body).thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
+    }
+
+    public static CompletableFuture<PlayerInfo> search(HttpClient client, String query) {
+        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/search_profile/" + query;
+        final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
+
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body).thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
     }
 
     public int getRegionColor() {

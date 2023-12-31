@@ -1,5 +1,6 @@
 package com.kevin.tiertagger.tierlist;
 
+import com.kevin.tiertagger.TierCache;
 import com.kevin.tiertagger.TierTagger;
 import com.kevin.tiertagger.model.PlayerInfo;
 import net.minecraft.client.MinecraftClient;
@@ -45,7 +46,7 @@ public class PlayerSearchScreen extends CloseableScreen {
     private void tryShowProfile() {
         String username = this.textField.getText();
         PlayerInfoScreen.fetchUUID(username.toLowerCase(Locale.ROOT))
-                .thenComposeAsync(u -> PlayerInfo.get(TierTagger.getClient(), u))
+                .thenApplyAsync(u -> TierCache.getPlayerInfo(u).orElseThrow())
                 .exceptionally(t -> {
                     Ukutils.sendToast(Text.of("Error"), Text.of("Could not find player " + username));
                     return null;

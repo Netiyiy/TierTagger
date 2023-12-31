@@ -1,7 +1,6 @@
 plugins {
-    id 'fabric-loom' version '1.3-SNAPSHOT'
-    id "io.freefair.lombok" version "8.3"
-    id "io.github.juuxel.loom-vineflower" version "1.11.0"
+    id 'fabric-loom' version '1.4-SNAPSHOT'
+    id "io.freefair.lombok" version "8.4"
 }
 
 version = "${project.mod_version}+mc${project.minecraft_version}"
@@ -19,9 +18,7 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    modApi("net.uku3lig:ukulib:${project.ukulib_version}") {
-        exclude group: "com.terraformersmc"
-    }
+    modApi "net.uku3lig:ukulib:${project.ukulib_version}"
 }
 
 processResources {

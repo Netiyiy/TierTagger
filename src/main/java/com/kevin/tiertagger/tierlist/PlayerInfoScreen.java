@@ -1,7 +1,5 @@
 package com.kevin.tiertagger.tierlist;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.kevin.tiertagger.TierCache;
 import com.kevin.tiertagger.model.PlayerInfo;
 import lombok.Setter;
@@ -22,20 +20,17 @@ import net.minecraft.util.Identifier;
 import net.uku3lig.ukulib.config.screen.CloseableScreen;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 @Slf4j
 @Setter
 public class PlayerInfoScreen extends CloseableScreen {
-    private static final Map<String, UUID> uuidCache = new HashMap<>();
+    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 
     private static final Map<String, String> MODE_NAMES = Map.of(
             "vanilla", "☄ Vanilla",
@@ -65,7 +60,7 @@ public class PlayerInfoScreen extends CloseableScreen {
         this.fetchTexture(this.player).thenAccept(this::setTexture);
 
         if (this.info == null) {
-            fetchUUID(player).thenApply(u -> TierCache.getPlayerInfo(u).orElseThrow()).thenAccept(this::setInfo).exceptionally(t -> {
+            TierCache.searchPlayer(this.player).thenAccept(this::setInfo).exceptionally(t -> {
                 log.error("Could not fetch player info", t);
                 return null;
             });
@@ -79,7 +74,7 @@ public class PlayerInfoScreen extends CloseableScreen {
         context.drawCenteredTextWithShadow(this.textRenderer, this.player + "'s profile", this.width / 2, 20, 0xFFFFFF);
 
         if (this.texture != null && this.info != null) {
-            context.drawTexture(texture, this.width / 2 - 65, (this.height - 135) / 2, 0, 0, 60, 135, 60, 135);
+            context.drawTexture(texture, this.width / 2 - 65, (this.height - 144) / 2, 0, 0, 60, 144, 60, 144);
 
             int rankingHeight = this.info.rankings().size() * 10;
             int infoHeight = 55; // 4 lines of text (10 px tall) + 5 px padding
@@ -141,58 +136,23 @@ public class PlayerInfoScreen extends CloseableScreen {
 
         if (textureExists(tex)) return CompletableFuture.completedFuture(tex);
 
-        return fetchUUID(username)
-                .thenApply(uuid -> {
-                    TextureManager texManager = MinecraftClient.getInstance().getTextureManager();
+        TextureManager texManager = MinecraftClient.getInstance().getTextureManager();
+        HttpRequest req = HttpRequest.newBuilder(URI.create("https://mc-heads.net/body/" + username + "/240")).GET().build();
 
-                    try {
-                        URL url = new URL(" https://crafatar.com/renders/body/" + uuid + "?overlay");
-                        try (InputStream stream = url.openStream()) {
-                            NativeImage image = NativeImage.read(stream);
-                            texManager.registerTexture(tex, new NativeImageBackedTexture(image));
-                            return tex;
-                        }
-                    } catch (IOException e) {
-                        log.error("Could not fetch head texture", e);
-                        throw new CompletionException(e);
-                    }
-                });
-    }
+        return HTTP_CLIENT.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray()).thenApply(r -> {
+            if (r.statusCode() == 200) {
+                try {
+                    NativeImage image = NativeImage.read(r.body());
+                    texManager.registerTexture(tex, new NativeImageBackedTexture(image));
+                } catch (IOException e) {
+                    log.error("Failed to register head texture", e);
+                }
+            } else {
+                log.error("Could not fetch head texture: {} {}", r.statusCode(), new String(r.body()));
+            }
 
-    public static CompletableFuture<UUID> fetchUUID(String user) {
-        String username = user.toLowerCase();
-
-        if (uuidCache.containsKey(username)) {
-            return CompletableFuture.completedFuture(uuidCache.get(username));
-        }
-
-        HttpRequest uuidReq = HttpRequest.newBuilder(URI.create("https://api.mojang.com/users/profiles/minecraft/" + username))
-                .GET().build();
-
-        return HttpClient.newHttpClient().sendAsync(uuidReq, HttpResponse.BodyHandlers.ofString())
-                .thenApply(res -> {
-                    if (res.statusCode() != 200) {
-                        log.error("Error while getting UUID of " + username + ": " + res.statusCode() + " " + res.body());
-                        throw new CompletionException(new NoSuchElementException("Error while getting UUID of " + username));
-                    }
-
-                    JsonObject json = new Gson().fromJson(res.body(), JsonObject.class);
-                    String uuid = json.get("id").getAsString();
-
-                    uuid(uuid).ifPresent(u -> uuidCache.put(username, u));
-
-                    return uuidCache.get(username);
-                });
-    }
-
-    private static Optional<UUID> uuid(String u) {
-        try {
-            long most = Long.parseUnsignedLong(u.substring(0, 16), 16);
-            long least = Long.parseUnsignedLong(u.substring(16), 16);
-            return Optional.of(new UUID(most, least));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+            return tex;
+        });
     }
 
     private Text formatTier(String mode, PlayerInfo.Ranking tier) {

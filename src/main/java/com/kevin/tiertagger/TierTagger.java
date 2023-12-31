@@ -12,16 +12,12 @@ import net.minecraft.util.Formatting;
 import net.uku3lig.ukulib.config.ConfigManager;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.http.HttpClient;
 import java.util.*;
 
 @Slf4j
 public class TierTagger implements ModInitializer {
     @Getter
     private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.create(TierTaggerConfig.class, "tiertagger");
-    private static final HttpClient client = HttpClient.newHttpClient();
-
-    private static final Map<UUID, Optional<PlayerInfo>> tiers = new HashMap<>();
 
     @Override
     public void onInitialize() {
@@ -30,7 +26,7 @@ public class TierTagger implements ModInitializer {
     public static Text appendTier(PlayerEntity player, Text text) {
         MutableText following = switch (manager.getConfig().getShownStatistic()) {
             case TIER -> getPlayerTier(player.getUuid());
-            case RANK -> getPlayerInfo(player.getUuid())
+            case RANK -> TierCache.getPlayerInfo(player.getUuid())
                     .map(i -> Text.literal("#" + i.overall()))
                     .orElse(null);
         };
@@ -43,18 +39,11 @@ public class TierTagger implements ModInitializer {
         return text;
     }
 
-    private static Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
-        return tiers.computeIfAbsent(uuid, u -> {
-            PlayerInfo.get(client, uuid).thenAccept(info -> tiers.put(uuid, Optional.ofNullable(info)));
-            return Optional.empty();
-        });
-    }
-
     @Nullable
     private static MutableText getPlayerTier(UUID uuid) {
         String mode = manager.getConfig().getGameMode().getApiKey();
 
-        return getPlayerInfo(uuid)
+        return TierCache.getPlayerInfo(uuid)
                 .map(i -> i.rankings().get(mode))
                 .map(TierTagger::getTierText)
                 .map(t -> Text.literal(t).styled(s -> s.withColor(getTierColor(t))))
@@ -93,9 +82,4 @@ public class TierTagger implements ModInitializer {
             default -> 0xD3D3D3; // DEFAULT: pale grey
         };
     }
-
-    public static void clearCache() {
-        tiers.clear();
-    }
-
 }

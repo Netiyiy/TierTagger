@@ -197,9 +197,9 @@ public class PlayerInfoScreen extends CloseableScreen {
     private Text formatTier(String mode, PlayerInfo.Ranking tier) {
         MutableText tierText = getTierText(tier.tier(), tier.pos(), tier.retired());
 
-        if (tier.peak_tier() != null && tier.peak_pos() != null && tier.peak_tier() <= tier.tier() && tier.peak_pos() < tier.pos()) {
+        if (tier.peakTier() != null && tier.peakPos() != null && tier.peakTier() <= tier.tier() && tier.peakPos() < tier.pos()) {
             tierText = tierText.append(Text.literal(" (peak: ").styled(s -> s.withColor(Formatting.GRAY)))
-                    .append(getTierText(tier.peak_tier(), tier.peak_pos(), tier.retired()))
+                    .append(getTierText(tier.peakTier(), tier.peakPos(), tier.retired()))
                     .append(Text.literal(")").styled(s -> s.withColor(Formatting.GRAY)));
         }
 

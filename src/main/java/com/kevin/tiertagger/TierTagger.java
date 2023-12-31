@@ -56,12 +56,29 @@ public class TierTagger implements ModInitializer {
 
         return getPlayerInfo(uuid)
                 .map(i -> i.getRankings().get(mode))
-                .map(r -> (r.getPos() == 0 ? "H" : "L") + "T" + r.getTier())
+                .map(TierTagger::getTierText)
                 .map(t -> Text.literal(t).styled(s -> s.withColor(getTierColor(t))))
                 .orElse(null);
     }
 
+    @Nullable
+    private static String getTierText(PlayerInfo.Ranking ranking) {
+        if (ranking.isRetired() && ranking.getPeakTier() != null && ranking.getPeakPos() != null) {
+            if (!manager.getConfig().isShowRetired()) {
+                return null; // don't show retired
+            } else {
+                return "R" + (ranking.getPeakPos() == 0 ? "H" : "L") + "T" + ranking.getPeakTier();
+            }
+        } else {
+            return (ranking.getPos() == 0 ? "H" : "L") + "T" + ranking.getTier();
+        }
+    }
+
     private static int getTierColor(String tier) {
+        if (tier.startsWith("R")) {
+            return 0x662B99; // ourple
+        }
+
         return switch (tier) {
             case "HT1" -> 0xFF0000; // red
             case "LT1" -> 0xFFB6C1; // light pink

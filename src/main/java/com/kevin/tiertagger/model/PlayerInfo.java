@@ -1,10 +1,10 @@
 package com.kevin.tiertagger.model;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.kevin.tiertagger.TierTagger;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -25,34 +25,24 @@ public final class PlayerInfo {
     public static final class Ranking {
         private final int tier;
         private final int pos;
+
+        @Nullable
+        @SerializedName("peak_tier")
+        private final Integer peakTier;
+
+        @Nullable
+        @SerializedName("peak_pos")
+        private final Integer peakPos;
+
+        private final boolean retired;
     }
 
     public static CompletableFuture<PlayerInfo> get(HttpClient client, UUID uuid) {
-        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuidStr(uuid);
+        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuid.toString().replace("-", "");
         final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public enum PointInfo {
-        COMBAT_MASTER("Combat Master", 0xFBB03B, 0xFFD13A),
-        COMBAT_ACE("Combat Ace", 0xCD285C, 0xD65474),
-        COMBAT_SPECIALIST("Combat Specialist", 0xAD78D8, 0xC7A3E8),
-        COMBAT_CADET("Combat Cadet", 0x9291D9, 0xADACE2),
-        COMBAT_NOVICE("Combat Novice", 0x9291D9, 0xFFFFFF),
-        ROOKIE("Rookie", 0x6C7178, 0x8B979C),
-        UNRANKED("Unranked", 0xFFFFFF, 0xFFFFFF);
-
-        private final String title;
-        private final int color;
-        private final int accentColor;
-    }
-
-    private static String uuidStr(UUID uuid) {
-        return uuid.toString().replace("-", "");
     }
 }

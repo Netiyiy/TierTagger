@@ -1,6 +1,7 @@
 package com.kevin.tiertagger.model;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,8 @@ import java.util.concurrent.CompletableFuture;
 
 public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings, String region, int points,
                          int overall, List<Badge> badges) {
-    public record Ranking(int tier, int pos, @Nullable Integer peak_tier, @Nullable Integer peak_pos, long attained,
+    public record Ranking(int tier, int pos, @Nullable @SerializedName("peak_tier") Integer peakTier,
+                          @Nullable @SerializedName("peak_pos") Integer peakPos, long attained,
                           boolean retired) {
     }
 
@@ -36,7 +38,7 @@ public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings
     );
 
     public static CompletableFuture<PlayerInfo> get(HttpClient client, UUID uuid) {
-        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuidStr(uuid);
+        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuid.toString().replace("-", "");
         final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
@@ -65,7 +67,7 @@ public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings
     }
 
     public PointInfo getPointInfo() {
-        if (this.points >= 235 && this.rankings.values().stream().allMatch(r -> r.tier <= 2 || (r.peak_tier != null && r.peak_tier <= 2))) {
+        if (this.points >= 235 && this.rankings.values().stream().allMatch(r -> r.tier <= 2 || (r.peakTier != null && r.peakTier <= 2))) {
             return PointInfo.COMBAT_MASTER;
         } else if (this.points >= 100) {
             return PointInfo.COMBAT_ACE;
@@ -92,9 +94,5 @@ public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings
                 .thenComparingInt(a -> a.ranking.pos));
 
         return tiers;
-    }
-
-    private static String uuidStr(UUID uuid) {
-        return uuid.toString().replace("-", "");
     }
 }

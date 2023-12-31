@@ -20,6 +20,7 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
                 CyclingOption.ofBoolean("tiertagger.config.enabled", config.isEnabled(), config::setEnabled),
                 CyclingOption.ofTranslatableEnum("tiertagger.config.gamemode", GameMode.class, config.getGameMode(), config::setGameMode),
                 CyclingOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
+                CyclingOption.ofBoolean("tiertagger.config.retired", config.isShowRetired(), config::setShowRetired),
                 CyclingOption.ofTranslatableEnum("tiertagger.config.statistic", Statistic.class, config.getShownStatistic(), config::setShownStatistic),
                 new SimpleButton("tiertagger.clear", b -> TierTagger.clearCache()),
                 new ScreenOpenButton("tiertagger.config.search", PlayerSearchScreen::new)

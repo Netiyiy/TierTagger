@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class TierCache {
     private static final HttpClient CLIENT = HttpClient.newHttpClient();
@@ -19,7 +20,21 @@ public class TierCache {
         });
     }
 
+    public static CompletableFuture<PlayerInfo> searchPlayer(String query) {
+        return PlayerInfo.search(CLIENT, query).thenApply(p -> {
+            UUID uuid = fromStr(p.uuid());
+            TIERS.put(uuid, Optional.of(p));
+            return p;
+        });
+    }
+
     public static void clearCache() {
         TIERS.clear();
+    }
+
+    private static UUID fromStr(String uuid) {
+        long mostSignificant = Long.parseUnsignedLong(uuid.substring(0, 16), 16);
+        long leastSignificant = Long.parseUnsignedLong(uuid.substring(16), 16);
+        return new UUID(mostSignificant, leastSignificant);
     }
 }

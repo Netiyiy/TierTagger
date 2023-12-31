@@ -18,6 +18,8 @@ import java.util.concurrent.CompletableFuture;
 @SuppressWarnings("ClassCanBeRecord") // records don't work with the current version of gson
 public final class PlayerInfo {
     // other fields stripped out for conciseness
+    private final String uuid;
+    private final String name;
     private final Map<String, Ranking> rankings;
     private final int overall;
 
@@ -39,6 +41,15 @@ public final class PlayerInfo {
 
     public static CompletableFuture<PlayerInfo> get(HttpClient client, UUID uuid) {
         String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuid.toString().replace("-", "");
+        final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
+
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
+    }
+
+    public static CompletableFuture<PlayerInfo> search(HttpClient client, String query) {
+        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/search_profile/" + query;
         final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())

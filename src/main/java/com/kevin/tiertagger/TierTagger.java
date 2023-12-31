@@ -2,17 +2,26 @@ package com.kevin.tiertagger;
 
 import com.kevin.tiertagger.config.TierTaggerConfig;
 import com.kevin.tiertagger.model.PlayerInfo;
+import com.mojang.brigadier.context.CommandContext;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.uku3lig.ukulib.config.ConfigManager;
+import net.uku3lig.ukulib.utils.PlayerArgumentType;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
+
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 @Slf4j
 public class TierTagger implements ModInitializer {
@@ -21,6 +30,10 @@ public class TierTagger implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registry) -> dispatcher.register(
+                literal("tiertagger")
+                        .then(argument("player", PlayerArgumentType.player())
+                                .executes(TierTagger::displayTierInfo))));
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
@@ -61,6 +74,46 @@ public class TierTagger implements ModInitializer {
         } else {
             return (ranking.getPos() == 0 ? "H" : "L") + "T" + ranking.getTier();
         }
+    }
+
+    private static int displayTierInfo(CommandContext<FabricClientCommandSource> ctx) {
+        PlayerArgumentType.PlayerSelector selector = ctx.getArgument("player", PlayerArgumentType.PlayerSelector.class);
+
+        Optional<PlayerInfo> info = ctx.getSource().getWorld().getPlayers().stream()
+                .filter(p -> p.getEntityName().equalsIgnoreCase(selector.name()) || p.getUuidAsString().equalsIgnoreCase(selector.name()))
+                .findFirst()
+                .map(Entity::getUuid)
+                .flatMap(TierCache::getPlayerInfo);
+
+        if (info.isPresent()) {
+            ctx.getSource().sendFeedback(printPlayerInfo(info.get()));
+        } else {
+            ctx.getSource().sendFeedback(Text.of("[TierTagger] Searching..."));
+            TierCache.searchPlayer(selector.name())
+                    .thenAccept(p -> ctx.getSource().sendFeedback(printPlayerInfo(p)))
+                    .exceptionally(t -> {
+                        ctx.getSource().sendError(Text.of("Could not find player " + selector.name()));
+                        log.error("MIGUEL", t);
+                        return null;
+                    });
+        }
+
+        return 0;
+    }
+
+    private static Text printPlayerInfo(PlayerInfo info) {
+        MutableText text = Text.empty().append("=== Rankings for " + info.getName() + " ===");
+
+        info.getRankings().forEach((m, r) -> {
+            String tier = getTierText(r);
+
+            if (tier != null) {
+                Text tierText = Text.literal(tier).styled(s -> s.withColor(getTierColor(tier)));
+                text.append(Text.literal("\n" + m + ": ").append(tierText));
+            }
+        });
+
+        return text;
     }
 
     private static int getTierColor(String tier) {

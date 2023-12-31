@@ -1,5 +1,6 @@
 package com.kevin.tiertagger.config;
 
+import com.kevin.tiertagger.TierCache;
 import com.kevin.tiertagger.TierTagger;
 import com.kevin.tiertagger.tierlist.PlayerSearchScreen;
 import com.mojang.serialization.Codec;
@@ -28,7 +29,7 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
                 new SimpleOption<>("tiertagger.config.statistic", SimpleOption.emptyTooltip(), SimpleOption.enumValueText(),
                         new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(Statistic.values()), Codec.INT.xmap(Statistic::byId, Statistic::getId)),
                         config.getShownStatistic(), config::setShownStatistic),
-                Ukutils.createButton("tiertagger.clear", s -> TierTagger.clearCache()),
+                Ukutils.createButton("tiertagger.clear", s -> TierCache.clearCache()),
                 Ukutils.createOpenButton("tiertagger.config.search", PlayerSearchScreen::new),
         };
     }

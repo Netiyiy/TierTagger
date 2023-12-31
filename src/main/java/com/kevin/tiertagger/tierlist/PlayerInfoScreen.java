@@ -2,7 +2,7 @@ package com.kevin.tiertagger.tierlist;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.kevin.tiertagger.TierTagger;
+import com.kevin.tiertagger.TierCache;
 import com.kevin.tiertagger.model.PlayerInfo;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
@@ -67,7 +68,7 @@ public class PlayerInfoScreen extends Screen {
         this.fetchTexture(this.player).thenAccept(this::setTexture);
 
         if (this.info == null) {
-            fetchUUID(player).thenCompose(u -> PlayerInfo.get(TierTagger.getClient(), u)).thenAccept(this::setInfo).exceptionally(t -> {
+            fetchUUID(player).thenApply(u -> TierCache.getPlayerInfo(u).orElseThrow()).thenAccept(this::setInfo).exceptionally(t -> {
                 log.error("Could not fetch player info", t);
                 return null;
             });
@@ -177,7 +178,7 @@ public class PlayerInfoScreen extends Screen {
         HttpRequest uuidReq = HttpRequest.newBuilder(URI.create("https://api.mojang.com/users/profiles/minecraft/" + username))
                 .GET().build();
 
-        return TierTagger.getClient().sendAsync(uuidReq, HttpResponse.BodyHandlers.ofString())
+        return HttpClient.newHttpClient().sendAsync(uuidReq, HttpResponse.BodyHandlers.ofString())
                 .thenApply(res -> {
                     if (res.statusCode() != 200) {
                         log.error("Error while getting UUID of " + username + ": " + res.statusCode() + " " + res.body());

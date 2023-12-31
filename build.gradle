@@ -18,9 +18,7 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    modApi("net.uku3lig:ukulib:${project.ukulib_version}") {
-        exclude group: "com.terraformersmc"
-    }
+    modApi "net.uku3lig:ukulib:${project.ukulib_version}"
 }
 
 processResources {

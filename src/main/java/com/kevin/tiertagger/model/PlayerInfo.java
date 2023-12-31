@@ -13,9 +13,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public record PlayerInfo(Map<String, Ranking> rankings, int overall) {
-    public record Ranking(int tier, int pos, boolean retired,
-                          @Nullable @SerializedName("peak_tier") Integer peakTier,
+public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings, int overall) {
+    public record Ranking(int tier, int pos, boolean retired, @Nullable @SerializedName("peak_tier") Integer peakTier,
                           @Nullable @SerializedName("peak_pos") Integer peakPos) {
     }
 
@@ -23,8 +22,13 @@ public record PlayerInfo(Map<String, Ranking> rankings, int overall) {
         String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuid.toString().replace("-", "");
         final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
 
-        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body).thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
+    }
+
+    public static CompletableFuture<PlayerInfo> search(HttpClient client, String query) {
+        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/search_profile/" + query;
+        final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
+
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body).thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
     }
 }

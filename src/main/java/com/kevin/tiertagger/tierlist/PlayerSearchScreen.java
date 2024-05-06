@@ -16,6 +16,7 @@ import java.util.Locale;
 
 public class PlayerSearchScreen extends Screen {
     private TextFieldWidget textField;
+    private ButtonWidget searchButton;
     private final Screen parent;
 
     public PlayerSearchScreen(Screen parent) {
@@ -24,17 +25,12 @@ public class PlayerSearchScreen extends Screen {
     }
 
     @Override
-    public void tick() {
-        this.textField.tick();
-    }
-
-    @Override
     protected void init() {
         this.textField = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 116, 200, 20, Text.empty());
         this.textField.setMaxLength(32);
         this.addSelectableChild(this.textField);
 
-        this.addDrawableChild(
+        this.searchButton = this.addDrawableChild(
                 ButtonWidget.builder(Text.translatable("tiertagger.search"), button -> this.tryShowProfile())
                         .dimensions(this.width / 2 - 100, this.height / 4 + 96 + 12, 200, 20)
                         .build()
@@ -46,6 +42,13 @@ public class PlayerSearchScreen extends Screen {
         );
 
         this.setInitialFocus(this.textField);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        this.textField.tick();
+        this.searchButton.active = this.textField.getText().matches("[a-zA-Z0-9_-]+");
     }
 
     private void tryShowProfile() {

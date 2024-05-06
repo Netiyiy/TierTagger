@@ -15,6 +15,7 @@ import java.util.Locale;
 
 public class PlayerSearchScreen extends CloseableScreen {
     private TextInputWidget textField;
+    private ButtonWidget searchButton;
 
     public PlayerSearchScreen(Screen parent) {
         super("Player Search", parent);
@@ -24,10 +25,9 @@ public class PlayerSearchScreen extends CloseableScreen {
     protected void init() {
         String username = Text.translatable("tiertagger.search.user").getString();
         this.textField = this.addSelectableChild(new TextInputWidget(this.width / 2 - 100, 116, 200, 20,
-                "", s -> {
-        }, username, s -> true, 32));
+                "", s -> {}, username, s -> s.matches("[a-zA-Z0-9_-]+"), 32));
 
-        this.addDrawableChild(
+        this.searchButton = this.addDrawableChild(
                 ButtonWidget.builder(Text.translatable("tiertagger.search"), button -> this.tryShowProfile())
                         .dimensions(this.width / 2 - 100, this.height / 4 + 96 + 12, 200, 20)
                         .build()
@@ -39,6 +39,12 @@ public class PlayerSearchScreen extends CloseableScreen {
         );
 
         this.setInitialFocus(this.textField);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        this.searchButton.active = this.textField.isValid();
     }
 
     private void tryShowProfile() {

@@ -8,7 +8,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -95,34 +94,6 @@ public class PlayerInfoScreen extends CloseableScreen {
             }
         } else {
             context.drawCenteredTextWithShadow(this.textRenderer, "Loading... (or player not found)", this.width / 2, this.height / 2, 0xFFFFFF);
-        }
-    }
-
-    @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.renderBackground(context, mouseX, mouseY, delta);
-
-        if (MinecraftClient.getInstance().world == null) {
-            context.setShaderColor(0.125F, 0.125F, 0.125F, 1.0F);
-            context.drawTexture(
-                    Screen.OPTIONS_BACKGROUND_TEXTURE,
-                    0,
-                    32,
-                    this.width,
-                    this.height - 32.0f,
-                    this.width,
-                    (this.height - 32) - 32,
-                    32,
-                    32
-            );
-            context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
-            context.setShaderColor(0.25F, 0.25F, 0.25F, 1.0F);
-            context.drawTexture(Screen.OPTIONS_BACKGROUND_TEXTURE, 0, 0, 0.0F, 0.0F, this.width, 32, 32, 32);
-            context.drawTexture(Screen.OPTIONS_BACKGROUND_TEXTURE, 0, this.height - 32, 0.0F, this.height - 32.0f, this.width, 32, 32, 32);
-            context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            context.fillGradient(RenderLayer.getGuiOverlay(), 0, 32, this.width, 32 + 4, -16777216, 0, 0);
-            context.fillGradient(RenderLayer.getGuiOverlay(), 0, this.height - 32 - 4, this.width, this.height - 32, 0, -16777216, 0);
         }
     }
 

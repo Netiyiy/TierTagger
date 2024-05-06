@@ -44,6 +44,7 @@ public class PlayerInfoScreen extends CloseableScreen {
     private String player;
     private Identifier texture;
     private PlayerInfo info;
+    private boolean everythingIsAwesome = true;
 
     public PlayerInfoScreen(Screen parent, String player) {
         super(Text.of("Player Info"), parent);
@@ -61,6 +62,7 @@ public class PlayerInfoScreen extends CloseableScreen {
         if (this.info == null) {
             TierCache.searchPlayer(this.player).thenAccept(this::setInfo).exceptionally(t -> {
                 log.error("Could not fetch player info", t);
+                this.everythingIsAwesome = false;
                 return null;
             });
         }
@@ -93,7 +95,8 @@ public class PlayerInfoScreen extends CloseableScreen {
                 rankingY += 10;
             }
         } else {
-            context.drawCenteredTextWithShadow(this.textRenderer, "Loading... (or player not found)", this.width / 2, this.height / 2, 0xFFFFFF);
+            String text = this.everythingIsAwesome ? "Loading..." : "Unknown player";
+            context.drawCenteredTextWithShadow(this.textRenderer, text, this.width / 2, this.height / 2, 0xFFFFFF);
         }
     }
 

@@ -15,7 +15,7 @@ public class TierCache {
 
     public static void init() {
         TierList.get(TierTagger.getClient()).thenAccept(list -> {
-            Map<UUID, Optional<PlayerInfo>> players = list.players().stream().collect(Collectors.toMap(p -> UUID.fromString(p.uuid()), Optional::of));
+            Map<UUID, Optional<PlayerInfo>> players = list.players().stream().collect(Collectors.toMap(p -> parseUUID(p.uuid()), Optional::of));
             Map<UUID, Optional<PlayerInfo>> unknown = list.unknown().stream().collect(Collectors.toMap(u -> u, u -> Optional.empty()));
 
             TIERS.putAll(players);
@@ -37,7 +37,7 @@ public class TierCache {
 
     public static CompletableFuture<PlayerInfo> searchPlayer(String query) {
         return PlayerInfo.search(TierTagger.getClient(), query).thenApply(p -> {
-            UUID uuid = fromStr(p.uuid());
+            UUID uuid = parseUUID(p.uuid());
             TIERS.put(uuid, Optional.of(p));
             return p;
         });
@@ -47,10 +47,14 @@ public class TierCache {
         TIERS.clear();
     }
 
-    private static UUID fromStr(String uuid) {
-        long mostSignificant = Long.parseUnsignedLong(uuid.substring(0, 16), 16);
-        long leastSignificant = Long.parseUnsignedLong(uuid.substring(16), 16);
-        return new UUID(mostSignificant, leastSignificant);
+    private static UUID parseUUID(String uuid) {
+        try {
+            return UUID.fromString(uuid);
+        } catch (Exception e) {
+            long mostSignificant = Long.parseUnsignedLong(uuid.substring(0, 16), 16);
+            long leastSignificant = Long.parseUnsignedLong(uuid.substring(16), 16);
+            return new UUID(mostSignificant, leastSignificant);
+        }
     }
 
     private TierCache() {

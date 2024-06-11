@@ -15,7 +15,10 @@ public class TierCache {
 
     public static Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
         return TIERS.computeIfAbsent(uuid, u -> {
-            PlayerInfo.get(CLIENT, uuid).thenAccept(info -> TIERS.put(uuid, Optional.ofNullable(info)));
+            if (uuid.version() == 4) {
+                PlayerInfo.get(CLIENT, uuid).thenAccept(info -> TIERS.put(uuid, Optional.ofNullable(info)));
+            }
+
             return Optional.empty();
         });
     }
@@ -36,5 +39,8 @@ public class TierCache {
         long mostSignificant = Long.parseUnsignedLong(uuid.substring(0, 16), 16);
         long leastSignificant = Long.parseUnsignedLong(uuid.substring(16), 16);
         return new UUID(mostSignificant, leastSignificant);
+    }
+
+    private TierCache() {
     }
 }

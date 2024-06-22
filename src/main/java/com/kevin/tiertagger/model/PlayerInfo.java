@@ -45,7 +45,10 @@ public final class PlayerInfo {
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
-                .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
+                .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class))
+                .whenComplete((i, t) -> {
+                    if (t != null) TierTagger.getLogger().warn("Error getting player info ({})", uuid, t);
+                });
     }
 
     public static CompletableFuture<PlayerInfo> search(HttpClient client, String query) {
@@ -54,6 +57,9 @@ public final class PlayerInfo {
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
-                .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class));
+                .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class))
+                .whenComplete((i, t) -> {
+                    if (t != null) TierTagger.getLogger().warn("Error searching player {}", query, t);
+                });
     }
 }

@@ -4,7 +4,6 @@ import com.kevin.tiertagger.config.TierTaggerConfig;
 import com.kevin.tiertagger.model.PlayerInfo;
 import com.mojang.brigadier.context.CommandContext;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -16,6 +15,8 @@ import net.minecraft.util.Formatting;
 import net.uku3lig.ukulib.config.ConfigManager;
 import net.uku3lig.ukulib.utils.PlayerArgumentType;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -23,10 +24,12 @@ import java.util.UUID;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-@Slf4j
 public class TierTagger implements ModInitializer {
     @Getter
     private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.create(TierTaggerConfig.class, "tiertagger");
+
+    @Getter
+    private static final Logger logger = LoggerFactory.getLogger(TierTagger.class);
 
     @Override
     public void onInitialize() {
@@ -93,7 +96,6 @@ public class TierTagger implements ModInitializer {
                     .thenAccept(p -> ctx.getSource().sendFeedback(printPlayerInfo(p)))
                     .exceptionally(t -> {
                         ctx.getSource().sendError(Text.of("Could not find player " + selector.name()));
-                        log.error("MIGUEL", t);
                         return null;
                     });
         }

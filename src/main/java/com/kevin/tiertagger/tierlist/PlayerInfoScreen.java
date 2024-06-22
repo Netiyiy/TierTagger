@@ -1,9 +1,9 @@
 package com.kevin.tiertagger.tierlist;
 
 import com.kevin.tiertagger.TierCache;
+import com.kevin.tiertagger.TierTagger;
 import com.kevin.tiertagger.model.PlayerInfo;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -26,7 +26,6 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-@Slf4j
 @Setter
 public class PlayerInfoScreen extends Screen {
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
@@ -64,11 +63,12 @@ public class PlayerInfoScreen extends Screen {
         this.fetchTexture(this.player).thenAccept(this::setTexture);
 
         if (this.info == null) {
-            TierCache.searchPlayer(this.player).thenAccept(this::setInfo).exceptionally(t -> {
-                log.error("Could not fetch player info", t);
-                this.everythingIsAwesome = false;
-                return null;
-            });
+            TierCache.searchPlayer(this.player).thenAccept(this::setInfo)
+                    .whenComplete((v, t) -> {
+                        if (t != null) {
+                            this.everythingIsAwesome = false;
+                        }
+                    });
         }
     }
 
@@ -157,10 +157,10 @@ public class PlayerInfoScreen extends Screen {
                     NativeImage image = NativeImage.read(r.body());
                     texManager.registerTexture(tex, new NativeImageBackedTexture(image));
                 } catch (IOException e) {
-                    log.error("Failed to register head texture", e);
+                    TierTagger.getLogger().error("Failed to register head texture", e);
                 }
             } else {
-                log.error("Could not fetch head texture: {} {}", r.statusCode(), new String(r.body()));
+                TierTagger.getLogger().error("Could not fetch head texture: {} {}", r.statusCode(), new String(r.body()));
             }
 
             return tex;

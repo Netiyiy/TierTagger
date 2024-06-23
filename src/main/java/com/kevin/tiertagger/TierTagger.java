@@ -1,5 +1,8 @@
 package com.kevin.tiertagger;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.kevin.tiertagger.config.TierTaggerConfig;
 import com.kevin.tiertagger.model.PlayerInfo;
 import com.mojang.brigadier.context.CommandContext;
@@ -7,6 +10,9 @@ import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.VersionParsingException;
+import net.minecraft.SharedConstants;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
@@ -18,25 +24,42 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class TierTagger implements ModInitializer {
-    @Getter
-    private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.createDefault(TierTaggerConfig.class, "tiertagger");
+    public static final String MOD_ID = "tiertagger";
 
     @Getter
+    private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.createDefault(TierTaggerConfig.class, MOD_ID);
+    @Getter
     private static final Logger logger = LoggerFactory.getLogger(TierTagger.class);
+    @Getter
+    private static final HttpClient client = HttpClient.newHttpClient();
+    @Getter
+    private static Version latestVersion = null;
 
     @Override
     public void onInitialize() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registry) -> dispatcher.register(
-                literal("tiertagger")
+                literal(MOD_ID)
                         .then(argument("player", PlayerArgumentType.player())
                                 .executes(TierTagger::displayTierInfo))));
+
+        checkForUpdates().thenAccept(v -> {
+            logger.info("Found latest version {}", v.getFriendlyString());
+            latestVersion = v;
+        });
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
@@ -136,5 +159,36 @@ public class TierTagger implements ModInitializer {
             case "LT5" -> 0xD3D3D3; // pale grey
             default -> 0xD3D3D3; // DEFAULT: pale grey
         };
+    }
+
+    private static final String UPDATE_URL_FORMAT = "https://api.modrinth.com/v2/project/dpkYdLu5/version?game_versions=%s";
+
+    private static CompletableFuture<Version> checkForUpdates() {
+        String versionParam = "[\"%s\"]".formatted(SharedConstants.getGameVersion().getName());
+        String fullUrl = UPDATE_URL_FORMAT.formatted(URLEncoder.encode(versionParam, StandardCharsets.UTF_8));
+
+        HttpRequest request = HttpRequest.newBuilder(URI.create(fullUrl)).GET().build();
+
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(r -> {
+                    String body = r.body();
+                    JsonArray array = new Gson().fromJson(body, JsonArray.class);
+
+                    if (!array.isEmpty()) {
+                        JsonObject root = array.get(0).getAsJsonObject();
+                        String latestVer = root.get("version_number").getAsString();
+                        try {
+                            return Version.parse(latestVer);
+                        } catch (VersionParsingException e) {
+                            logger.warn("Could not parse version number {}", latestVer);
+                        }
+                    }
+
+                    return null;
+                })
+                .exceptionally(t -> {
+                    logger.warn("Error checking for updates", t);
+                    return null;
+                });
     }
 }

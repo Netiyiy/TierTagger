@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.uku3lig.ukulib.config.option.widget.TextInputWidget;
@@ -23,7 +24,7 @@ public class PlayerSearchScreen extends CloseableScreen {
 
     @Override
     protected void init() {
-        String username = Text.translatable("tiertagger.search.user").getString();
+        String username = I18n.translate("tiertagger.search.user");
         this.textField = this.addSelectableChild(new TextInputWidget(this.width / 2 - 100, 116, 200, 20,
                 "", s -> {}, username, s -> s.matches("[a-zA-Z0-9_-]+"), 32));
 

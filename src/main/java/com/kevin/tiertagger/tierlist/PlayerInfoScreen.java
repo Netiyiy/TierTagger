@@ -106,7 +106,7 @@ public class PlayerInfoScreen extends CloseableScreen {
 
     private CompletableFuture<Identifier> fetchTexture(String user) {
         String username = user.toLowerCase();
-        Identifier tex = new Identifier("tiertagger", "player_" + username);
+        Identifier tex = new Identifier(TierTagger.MOD_ID, "player_" + username);
 
         if (textureExists(tex)) return CompletableFuture.completedFuture(tex);
 

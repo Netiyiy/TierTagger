@@ -40,7 +40,7 @@ public final class PlayerInfo {
     }
 
     public static CompletableFuture<PlayerInfo> get(HttpClient client, UUID uuid) {
-        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/profile/" + uuid.toString().replace("-", "");
+        String endpoint = TierTagger.getManager().getConfig().getBaseUrl() + "/profile/" + uuid.toString().replace("-", "");
         final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
@@ -52,7 +52,7 @@ public final class PlayerInfo {
     }
 
     public static CompletableFuture<PlayerInfo> search(HttpClient client, String query) {
-        String endpoint = TierTagger.getManager().getConfig().getApiUrl() + "/search_profile/" + query;
+        String endpoint = TierTagger.getManager().getConfig().getBaseUrl() + "/search_profile/" + query;
         final HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())

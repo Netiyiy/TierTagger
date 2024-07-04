@@ -52,6 +52,8 @@ public class TierTagger implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        TierCache.init();
+
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registry) -> dispatcher.register(
                 literal(MOD_ID)
                         .then(argument("player", PlayerArgumentType.player())

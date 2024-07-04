@@ -1,15 +1,29 @@
 package com.kevin.tiertagger;
 
 import com.kevin.tiertagger.model.PlayerInfo;
+import com.kevin.tiertagger.model.TierList;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class TierCache {
     private static final Map<UUID, Optional<PlayerInfo>> TIERS = new HashMap<>();
+
+    public static void init() {
+        TierList.get(TierTagger.getClient()).thenAccept(list -> {
+            Map<UUID, Optional<PlayerInfo>> players = list.players().stream().collect(Collectors.toMap(p -> UUID.fromString(p.uuid()), Optional::of));
+            Map<UUID, Optional<PlayerInfo>> unknown = list.unknown().stream().collect(Collectors.toMap(u -> u, u -> Optional.empty()));
+
+            TIERS.putAll(players);
+            TIERS.putAll(unknown);
+
+            TierTagger.getLogger().info("Loaded {} players and {} unknown", players.size(), unknown.size());
+        });
+    }
 
     public static Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
         return TIERS.computeIfAbsent(uuid, u -> {

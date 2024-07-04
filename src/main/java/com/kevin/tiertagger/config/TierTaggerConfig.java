@@ -15,12 +15,15 @@ import java.util.function.IntFunction;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TierTaggerConfig implements IConfig<TierTaggerConfig> {
-    private String apiUrl = "https://mctiers.com/api";
     private boolean enabled = true;
     private GameMode gameMode = GameMode.VANILLA;
     private boolean showUnranked = false;
     private boolean showRetired = true;
     private Statistic shownStatistic = Statistic.TIER;
+
+    // the field was renamed to do a little trolling and force it setting to the default value in players' config
+    // previous name(s): apiUrl
+    private String baseUrl = "https://api.uku3lig.net/tiers";
 
     @Override
     public TierTaggerConfig defaultConfig() {

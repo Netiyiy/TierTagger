@@ -30,13 +30,15 @@ public class MixinTitleScreen extends Screen {
         if (hasCheckedVersion) return;
 
         Version currentVersion = FabricLoader.getInstance().getModContainer("tier-tagger").map(m -> m.getMetadata().getVersion()).orElse(null);
-        if (currentVersion != null && currentVersion.compareTo(TierTagger.getLatestVersion()) < 0) {
-            Text newVersion = Text.literal(TierTagger.getLatestVersion().getFriendlyString()).formatted(Formatting.GREEN);
+        Version latestVersion = TierTagger.getLatestVersion();
+
+        if (currentVersion != null && latestVersion != null && currentVersion.compareTo(latestVersion) < 0) {
+            Text newVersion = Text.literal(latestVersion.getFriendlyString()).formatted(Formatting.GREEN);
 
             MinecraftClient.getInstance().setScreen(new ConfirmScreen(
                     b -> {
                         if (b) {
-                            String url = "https://modrinth.com/mod/tiertagger/version/" + TierTagger.getLatestVersion().getFriendlyString();
+                            String url = "https://modrinth.com/mod/tiertagger/version/" + latestVersion.getFriendlyString();
                             Util.getOperatingSystem().open(url);
                         }
 

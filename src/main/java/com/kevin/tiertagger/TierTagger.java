@@ -8,13 +8,14 @@ import com.kevin.tiertagger.model.PlayerInfo;
 import com.mojang.brigadier.context.CommandContext;
 import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.minecraft.SharedConstants;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -35,8 +36,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static net.fabricmc.fabric.api.client.command.v1.ClientCommandManager.argument;
+import static net.fabricmc.fabric.api.client.command.v1.ClientCommandManager.literal;
 
 public class TierTagger implements ModInitializer {
     public static final String MOD_ID = "tiertagger";
@@ -59,10 +60,9 @@ public class TierTagger implements ModInitializer {
     public void onInitialize() {
         TierCache.init();
 
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registry) -> dispatcher.register(
-                literal(MOD_ID)
-                        .then(argument("player", PlayerArgumentType.player())
-                                .executes(TierTagger::displayTierInfo))));
+        ClientCommandManager.DISPATCHER.register(
+                literal(MOD_ID).then(argument("player", PlayerArgumentType.player()).executes(TierTagger::displayTierInfo))
+        );
 
         checkForUpdates();
     }
@@ -71,12 +71,12 @@ public class TierTagger implements ModInitializer {
         MutableText following = switch (manager.getConfig().getShownStatistic()) {
             case TIER -> getPlayerTier(player.getUuid());
             case RANK -> TierCache.getPlayerInfo(player.getUuid())
-                    .map(i -> Text.literal("#" + i.getOverall()))
+                    .map(i -> new LiteralText("#" + i.getOverall()))
                     .orElse(null);
         };
 
         if (following != null) {
-            following.append(Text.literal(" | ").formatted(Formatting.GRAY));
+            following.append(new LiteralText(" | ").formatted(Formatting.GRAY));
             return following.append(text);
         }
 
@@ -90,7 +90,7 @@ public class TierTagger implements ModInitializer {
         return TierCache.getPlayerInfo(uuid)
                 .map(i -> i.getRankings().get(mode))
                 .map(TierTagger::getTierText)
-                .map(t -> Text.literal(t).styled(s -> s.withColor(getTierColor(t))))
+                .map(t -> new LiteralText(t).styled(s -> s.withColor(getTierColor(t))))
                 .orElse(null);
     }
 
@@ -132,14 +132,14 @@ public class TierTagger implements ModInitializer {
     }
 
     private static Text printPlayerInfo(PlayerInfo info) {
-        MutableText text = Text.empty().append("=== Rankings for " + info.getName() + " ===");
+        MutableText text = new LiteralText("=== Rankings for " + info.getName() + " ===");
 
         info.getRankings().forEach((m, r) -> {
             String tier = getTierText(r);
 
             if (tier != null) {
-                Text tierText = Text.literal(tier).styled(s -> s.withColor(getTierColor(tier)));
-                text.append(Text.literal("\n" + m + ": ").append(tierText));
+                Text tierText = new LiteralText(tier).styled(s -> s.withColor(getTierColor(tier)));
+                text.append(new LiteralText("\n" + m + ": ").append(tierText));
             }
         });
 

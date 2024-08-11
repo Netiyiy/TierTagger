@@ -92,7 +92,7 @@ public class TierTagger implements ModInitializer {
     }
 
     @Nullable
-    private static String getTierText(PlayerInfo.Ranking ranking) {
+    public static String getTierText(PlayerInfo.Ranking ranking) {
         if (ranking.retired() && ranking.peakTier() != null && ranking.peakPos() != null) {
             if (!manager.getConfig().isShowRetired()) {
                 return null; // don't show retired
@@ -143,7 +143,7 @@ public class TierTagger implements ModInitializer {
         return text;
     }
 
-    private static int getTierColor(String tier) {
+    public static int getTierColor(String tier) {
         if (tier.startsWith("R")) {
             return 0x662B99; // ourple
         }

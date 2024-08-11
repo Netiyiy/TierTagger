@@ -4,10 +4,10 @@
   "package": "com.kevin.tiertagger.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "MixinPlayerEntity"
   ],
   "client": [
-    "MixinTitleScreen",
-    "PlayerEntityRendererMixin"
+    "MixinTitleScreen"
   ],
   "injectors": {
     "defaultRequire": 1

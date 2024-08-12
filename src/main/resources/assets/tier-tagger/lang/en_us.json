@@ -2,6 +2,8 @@
   "tiertagger.config.enabled": "Enabled",
   "tiertagger.config.gamemode": "Gamemode",
   "tiertagger.config.retired": "Show Retired",
+  "tiertagger.config.highest": "Show Highest Tier",
+  "tiertagger.config.highest.desc": "If a person isn't ranked in the current selected gamemode, show their highest tier overall.",
   "tiertagger.config.statistic": "Shown Statistic",
   "tiertagger.config.search": "Search Player",
   "tiertagger.search": "Search",

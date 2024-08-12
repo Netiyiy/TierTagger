@@ -1,7 +1,6 @@
 {
   "tiertagger.config.enabled": "Enabled",
   "tiertagger.config.gamemode": "Gamemode",
-  "tiertagger.config.unranked": "Show Unranked",
   "tiertagger.config.retired": "Show Retired",
   "tiertagger.config.statistic": "Shown Statistic",
   "tiertagger.config.search": "Search Player",

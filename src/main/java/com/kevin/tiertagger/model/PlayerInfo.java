@@ -64,6 +64,10 @@ public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankin
         return REGION_COLORS.getOrDefault(this.region.toUpperCase(Locale.ROOT), 0xffffff);
     }
 
+    public Optional<Map.Entry<GameMode, Ranking>> getHighestRanking() {
+        return this.rankings.entrySet().stream().min(Comparator.comparingInt(e -> e.getValue().tier * 2 + e.getValue().pos));
+    }
+
     @Getter
     @AllArgsConstructor
     public enum PointInfo {

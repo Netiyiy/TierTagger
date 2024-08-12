@@ -20,12 +20,13 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
 
     @Override
     protected SimpleOption<?>[] getOptions(TierTaggerConfig config) {
-        return new SimpleOption[] {
+        return new SimpleOption[]{
                 SimpleOption.ofBoolean("tiertagger.config.enabled", config.isEnabled(), config::setEnabled),
                 new SimpleOption<>("tiertagger.config.gamemode", SimpleOption.emptyTooltip(), SimpleOption.enumValueText(),
                         new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(GameMode.values()), Codec.INT.xmap(GameMode::byId, GameMode::getId)),
                         config.getGameMode(), config::setGameMode),
                 SimpleOption.ofBoolean("tiertagger.config.retired", config.isShowRetired(), config::setShowRetired),
+                SimpleOption.ofBoolean("tiertagger.config.highest", SimpleOption.constantTooltip(Text.translatable("tiertagger.config.highest.desc")), config.isShowHighest(), config::setShowHighest),
                 new SimpleOption<>("tiertagger.config.statistic", SimpleOption.emptyTooltip(), SimpleOption.enumValueText(),
                         new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(TierTaggerConfig.Statistic.values()), Codec.INT.xmap(TierTaggerConfig.Statistic::byId, TierTaggerConfig.Statistic::getId)),
                         config.getShownStatistic(), config::setShownStatistic),

@@ -22,6 +22,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.uku3lig.ukulib.config.ConfigManager;
 import net.uku3lig.ukulib.utils.PlayerArgumentType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -90,21 +93,29 @@ public class TierTagger implements ModInitializer {
         GameMode mode = manager.getConfig().getGameMode();
 
         return TierCache.getPlayerInfo(uuid)
-                .map(i -> i.rankings().get(mode))
-                .map(TierTagger::getTierText)
-                .map(t -> Text.literal(t).styled(s -> s.withColor(getTierColor(t))))
-                .map(t -> mode.getIconText().append(" ").append(t))
+                .map(info -> {
+                    PlayerInfo.Ranking ranking = info.rankings().get(mode);
+                    Optional<Map.Entry<GameMode, PlayerInfo.Ranking>> highest = info.getHighestRanking();
+                    if (ranking == null && manager.getConfig().isShowHighest() && highest.isPresent()) {
+                        return highest.get();
+                    } else if (ranking != null) {
+                        return new AbstractMap.SimpleEntry<>(mode, ranking);
+                    } else {
+                        return null;
+                    }
+                })
+                .map(entry -> {
+                    String tier = getTierText(entry.getValue());
+                    Text formattedTier = Text.literal(tier).withColor(getTierColor(tier));
+                    return entry.getKey().getIconText().append(" ").append(formattedTier);
+                })
                 .orElse(null);
     }
 
-    @Nullable
+    @NotNull
     public static String getTierText(PlayerInfo.Ranking ranking) {
-        if (ranking.retired() && ranking.peakTier() != null && ranking.peakPos() != null) {
-            if (!manager.getConfig().isShowRetired()) {
-                return null; // don't show retired
-            } else {
-                return "R" + (ranking.peakPos() == 0 ? "H" : "L") + "T" + ranking.peakTier();
-            }
+        if (manager.getConfig().isShowRetired() && ranking.retired() && ranking.peakTier() != null && ranking.peakPos() != null) {
+            return "R" + (ranking.peakPos() == 0 ? "H" : "L") + "T" + ranking.peakTier();
         } else {
             return (ranking.pos() == 0 ? "H" : "L") + "T" + ranking.tier();
         }
@@ -140,10 +151,8 @@ public class TierTagger implements ModInitializer {
         info.rankings().forEach((m, r) -> {
             String tier = getTierText(r);
 
-            if (tier != null) {
-                Text tierText = Text.literal(tier).styled(s -> s.withColor(getTierColor(tier)));
-                text.append(Text.literal("\n" + m + ": ").append(tierText));
-            }
+            Text tierText = Text.literal(tier).styled(s -> s.withColor(getTierColor(tier)));
+            text.append(Text.literal("\n" + m + ": ").append(tierText));
         });
 
         return text;

@@ -1,9 +1,11 @@
 package com.kevin.tiertagger;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.kevin.tiertagger.config.TierTaggerConfig;
+import com.kevin.tiertagger.model.GameMode;
 import com.kevin.tiertagger.model.PlayerInfo;
 import com.mojang.brigadier.context.CommandContext;
 import lombok.Getter;
@@ -39,6 +41,8 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.lit
 
 public class TierTagger implements ModInitializer {
     public static final String MOD_ID = "tiertagger";
+
+    public static final Gson GSON = new GsonBuilder().registerTypeAdapter(GameMode.class, new GameMode.Deserializer()).create();
 
     @Getter
     private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.createDefault(TierTaggerConfig.class, MOD_ID);
@@ -82,12 +86,13 @@ public class TierTagger implements ModInitializer {
 
     @Nullable
     private static MutableText getPlayerTier(UUID uuid) {
-        String mode = manager.getConfig().getGameMode().getApiKey();
+        GameMode mode = manager.getConfig().getGameMode();
 
         return TierCache.getPlayerInfo(uuid)
                 .map(i -> i.rankings().get(mode))
                 .map(TierTagger::getTierText)
                 .map(t -> Text.literal(t).styled(s -> s.withColor(getTierColor(t))))
+                .map(t -> mode.getIconText().append(" ").append(t))
                 .orElse(null);
     }
 
@@ -174,7 +179,7 @@ public class TierTagger implements ModInitializer {
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(r -> {
                     String body = r.body();
-                    JsonArray array = new Gson().fromJson(body, JsonArray.class);
+                    JsonArray array = GSON.fromJson(body, JsonArray.class);
 
                     if (!array.isEmpty()) {
                         JsonObject root = array.get(0).getAsJsonObject();

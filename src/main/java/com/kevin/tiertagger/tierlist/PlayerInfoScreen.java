@@ -165,10 +165,9 @@ public class PlayerInfoScreen extends Screen {
                     .append(Text.literal(")").styled(s -> s.withColor(Formatting.GRAY)));
         }
 
-        Text modeText = Text.literal(mode.getIcon() + " " + mode.getTranslationKey() + ": ").formatted(Formatting.GRAY);
-
         return Text.empty()
-                .append(modeText)
+                .append(mode.formatted())
+                .append(Text.literal(": ").formatted(Formatting.GRAY))
                 .append(tierText);
     }
 

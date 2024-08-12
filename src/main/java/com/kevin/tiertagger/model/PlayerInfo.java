@@ -1,11 +1,10 @@
 package com.kevin.tiertagger.model;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.kevin.tiertagger.TierTagger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-import com.kevin.tiertagger.TierTagger;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,14 +13,14 @@ import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings, String region, int points,
+public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankings, String region, int points,
                          int overall, List<Badge> badges) {
     public record Ranking(int tier, int pos, @Nullable @SerializedName("peak_tier") Integer peakTier,
                           @Nullable @SerializedName("peak_pos") Integer peakPos, long attained,
                           boolean retired) {
     }
 
-    public record NamedRanking(String name, Ranking ranking) {
+    public record NamedRanking(GameMode mode, Ranking ranking) {
     }
 
     public record Badge(String title, String desc) {
@@ -43,7 +42,7 @@ public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
-                .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class))
+                .thenApply(s -> TierTagger.GSON.fromJson(s, PlayerInfo.class))
                 .whenComplete((i, t) -> {
                     if (t != null) TierTagger.getLogger().warn("Error getting player info ({})", uuid, t);
                 });
@@ -55,7 +54,7 @@ public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
-                .thenApply(s -> new Gson().fromJson(s, PlayerInfo.class))
+                .thenApply(s -> TierTagger.GSON.fromJson(s, PlayerInfo.class))
                 .whenComplete((i, t) -> {
                     if (t != null) TierTagger.getLogger().warn("Error searching player {}", query, t);
                 });

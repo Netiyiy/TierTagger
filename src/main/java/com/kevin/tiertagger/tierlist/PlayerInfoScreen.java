@@ -2,6 +2,7 @@ package com.kevin.tiertagger.tierlist;
 
 import com.kevin.tiertagger.TierCache;
 import com.kevin.tiertagger.TierTagger;
+import com.kevin.tiertagger.model.GameMode;
 import com.kevin.tiertagger.model.PlayerInfo;
 import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
@@ -23,22 +24,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Setter
 public class PlayerInfoScreen extends Screen {
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
-
-    private static final Map<String, String> MODE_NAMES = Map.of(
-            "vanilla", "☄ Vanilla",
-            "sword", "\uD83D\uDDE1 Sword",
-            "uhc", "\uD83E\uDEA3 UHC",
-            "pot", "\uD83E\uDDEA Pot",
-            "neth_pot", "❤ NethPot",
-            "smp", "\uD83D\uDD25 SMP",
-            "axe", "\uD83E\uDE93 Axe"
-    );
 
     private final Screen parent;
 
@@ -47,11 +37,10 @@ public class PlayerInfoScreen extends Screen {
     private PlayerInfo info;
     private boolean everythingIsAwesome = true;
 
-    public PlayerInfoScreen(Screen parent, String player, PlayerInfo info) {
+    public PlayerInfoScreen(Screen parent, String player) {
         super(Text.of("Player Info"));
         this.parent = parent;
         this.player = player;
-        this.info = info;
     }
 
     @Override
@@ -93,7 +82,7 @@ public class PlayerInfoScreen extends Screen {
 
             int rankingY = startY + infoHeight;
             for (PlayerInfo.NamedRanking namedRanking : this.info.getSortedTiers()) {
-                String mode = namedRanking.name();
+                GameMode mode = namedRanking.mode();
                 PlayerInfo.Ranking ranking = namedRanking.ranking();
 
                 context.drawTextWithShadow(this.textRenderer, formatTier(mode, ranking), this.width / 2 + 5, rankingY, 0xFFFFFF);
@@ -167,7 +156,7 @@ public class PlayerInfoScreen extends Screen {
         });
     }
 
-    private Text formatTier(String mode, PlayerInfo.Ranking tier) {
+    private Text formatTier(GameMode mode, PlayerInfo.Ranking tier) {
         MutableText tierText = getTierText(tier.tier(), tier.pos(), tier.retired());
 
         if (tier.peakTier() != null && tier.peakPos() != null && tier.peakTier() <= tier.tier() && tier.peakPos() < tier.pos()) {
@@ -176,8 +165,10 @@ public class PlayerInfoScreen extends Screen {
                     .append(Text.literal(")").styled(s -> s.withColor(Formatting.GRAY)));
         }
 
+        Text modeText = Text.literal(mode.getIcon() + " " + mode.getTranslationKey() + ": ").formatted(Formatting.GRAY);
+
         return Text.empty()
-                .append(Text.literal(MODE_NAMES.getOrDefault(mode, mode) + ": ").styled(s -> s.withColor(Formatting.GRAY)))
+                .append(modeText)
                 .append(tierText);
     }
 

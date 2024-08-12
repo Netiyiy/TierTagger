@@ -1,7 +1,6 @@
 package com.kevin.tiertagger.tierlist;
 
 import com.kevin.tiertagger.TierCache;
-import com.kevin.tiertagger.model.PlayerInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -53,16 +52,13 @@ public class PlayerSearchScreen extends Screen {
 
     private void tryShowProfile() {
         String username = this.textField.getText();
-        PlayerInfo i = TierCache.searchPlayer(username.toLowerCase(Locale.ROOT))
+        TierCache.searchPlayer(username.toLowerCase(Locale.ROOT))
                 .exceptionally(t -> {
                     sendToast("Could not find player " + username);
                     return null;
-                })
-                .join();
+                });
 
-        if (i != null) {
-            MinecraftClient.getInstance().setScreen(new PlayerInfoScreen(this, username, i));
-        }
+        MinecraftClient.getInstance().setScreen(new PlayerInfoScreen(this, username));
     }
 
     private void sendToast(String body) {

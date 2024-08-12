@@ -2,6 +2,7 @@ package com.kevin.tiertagger.config;
 
 import com.kevin.tiertagger.TierCache;
 import com.kevin.tiertagger.TierTagger;
+import com.kevin.tiertagger.model.GameMode;
 import com.kevin.tiertagger.tierlist.PlayerSearchScreen;
 import com.mojang.serialization.Codec;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,7 +23,7 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
         return new SimpleOption[] {
                 SimpleOption.ofBoolean("tiertagger.config.enabled", config.isEnabled(), config::setEnabled),
                 new SimpleOption<>("tiertagger.config.gamemode", SimpleOption.emptyTooltip(), SimpleOption.enumValueText(),
-                        new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(TierTaggerConfig.GameMode.values()), Codec.INT.xmap(TierTaggerConfig.GameMode::byId, TierTaggerConfig.GameMode::getId)),
+                        new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(GameMode.values()), Codec.INT.xmap(GameMode::byId, GameMode::getId)),
                         config.getGameMode(), config::setGameMode),
                 SimpleOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
                 SimpleOption.ofBoolean("tiertagger.config.retired", config.isShowRetired(), config::setShowRetired),

@@ -34,8 +34,14 @@ public enum GameMode implements TranslatableOption {
     private final String icon;
     private final TextColor iconColor;
 
+    private static final GameMode[] values = values();
+
     public MutableText formatted() {
         return Text.literal(this.icon + " " + this.translationKey).styled(s -> s.withColor(this.iconColor));
+    }
+
+    public GameMode next() {
+        return values[(ordinal() + 1) % values.length];
     }
 
     public static Optional<GameMode> byKey(String key) {

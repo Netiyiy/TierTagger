@@ -1,4 +1,5 @@
 {
+  "tiertagger.name": "TierTagger",
   "tiertagger.config.enabled": "Enabled",
   "tiertagger.config.gamemode": "Gamemode",
   "tiertagger.config.retired": "Show Retired",
@@ -14,5 +15,6 @@
   "tiertagger.outdated.title": "§c§lOutdated TierTagger version detected !!!",
   "tiertagger.outdated.desc": "A new version has been found: %s!\nIt is §nhighly recommended§r to update to keep the mod working!",
   "tiertagger.outdated.download": "§aDownload new version",
-  "tiertagger.outdated.ignore": "§4Ignore (not recommended)"
+  "tiertagger.outdated.ignore": "§4Ignore (not recommended)",
+  "tiertagger.keybind.gamemode": "Cycle between gamemodes"
 }

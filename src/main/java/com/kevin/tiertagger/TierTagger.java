@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
@@ -22,7 +23,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.uku3lig.ukulib.config.ConfigManager;
 import net.uku3lig.ukulib.utils.PlayerArgumentType;
+import net.uku3lig.ukulib.utils.Ukutils;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +66,17 @@ public class TierTagger implements ModInitializer {
                 literal(MOD_ID)
                         .then(argument("player", PlayerArgumentType.player())
                                 .executes(TierTagger::displayTierInfo))));
+
+        Ukutils.registerKeybinding(new KeyBinding("tiertagger.keybind.gamemode", GLFW.GLFW_KEY_UNKNOWN, "tiertagger.name"),
+                mc -> {
+                    GameMode next = manager.getConfig().getGameMode().next();
+                    manager.getConfig().setGameMode(next);
+
+                    if (mc.player != null) {
+                        Text message = Text.literal("Displayed gamemode: ").append(next.formatted());
+                        mc.player.sendMessage(message, true);
+                    }
+                });
 
         checkForUpdates().thenAccept(v -> {
             logger.info("Found latest version {}", v.getFriendlyString());

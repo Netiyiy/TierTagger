@@ -17,6 +17,7 @@ public class TierTaggerConfig implements Serializable {
     private boolean enabled = true;
     private GameMode gameMode = GameMode.VANILLA;
     private boolean showRetired = true;
+    private boolean showHighest = true;
     private Statistic shownStatistic = Statistic.TIER;
 
     // the field was renamed to do a little trolling and force it setting to the default value in players' config

@@ -18,6 +18,24 @@ public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankin
     public record Ranking(int tier, int pos, @Nullable @SerializedName("peak_tier") Integer peakTier,
                           @Nullable @SerializedName("peak_pos") Integer peakPos, long attained,
                           boolean retired) {
+
+        /**
+         * Lower is better.
+         */
+        public int comparableTier() {
+            return tier * 2 + pos;
+        }
+
+        /**
+         * Lower is better.
+         */
+        public int comparablePeak() {
+            if (peakTier == null || peakPos == null) {
+                return Integer.MAX_VALUE;
+            } else {
+                return peakTier * 2 + peakPos;
+            }
+        }
     }
 
     public record NamedRanking(GameMode mode, Ranking ranking) {
@@ -65,7 +83,7 @@ public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankin
     }
 
     public Optional<Map.Entry<GameMode, Ranking>> getHighestRanking() {
-        return this.rankings.entrySet().stream().min(Comparator.comparingInt(e -> e.getValue().tier * 2 + e.getValue().pos));
+        return this.rankings.entrySet().stream().min(Comparator.comparingInt(e -> e.getValue().comparableTier()));
     }
 
     @Getter

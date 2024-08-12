@@ -18,7 +18,6 @@ import java.util.function.IntFunction;
 public class TierTaggerConfig implements IConfig<TierTaggerConfig> {
     private boolean enabled = true;
     private GameMode gameMode = GameMode.VANILLA;
-    private boolean showUnranked = false;
     private boolean showRetired = true;
     private Statistic shownStatistic = Statistic.TIER;
 

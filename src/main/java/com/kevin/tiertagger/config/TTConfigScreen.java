@@ -25,7 +25,6 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
                 new SimpleOption<>("tiertagger.config.gamemode", SimpleOption.emptyTooltip(), SimpleOption.enumValueText(),
                         new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(GameMode.values()), Codec.INT.xmap(GameMode::byId, GameMode::getId)),
                         config.getGameMode(), config::setGameMode),
-                SimpleOption.ofBoolean("tiertagger.config.unranked", config.isShowUnranked(), config::setShowUnranked),
                 SimpleOption.ofBoolean("tiertagger.config.retired", config.isShowRetired(), config::setShowRetired),
                 new SimpleOption<>("tiertagger.config.statistic", SimpleOption.emptyTooltip(), SimpleOption.enumValueText(),
                         new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(TierTaggerConfig.Statistic.values()), Codec.INT.xmap(TierTaggerConfig.Statistic::byId, TierTaggerConfig.Statistic::getId)),

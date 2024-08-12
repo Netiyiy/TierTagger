@@ -16,10 +16,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 @Mixin(TitleScreen.class)
 public class MixinTitleScreen extends Screen {
     @Unique
-    private static boolean hasCheckedVersion = false;
+    private static final AtomicBoolean hasCheckedVersion = new AtomicBoolean(false);
 
     protected MixinTitleScreen(Text title) {
         super(title);
@@ -27,7 +29,7 @@ public class MixinTitleScreen extends Screen {
 
     @Inject(method = "init", at = @At("RETURN"))
     public void showUpdateScreen(CallbackInfo ci) {
-        if (hasCheckedVersion) return;
+        if (hasCheckedVersion.get()) return;
 
         Version currentVersion = FabricLoader.getInstance().getModContainer("tier-tagger").map(m -> m.getMetadata().getVersion()).orElse(null);
         Version latestVersion = TierTagger.getLatestVersion();
@@ -51,6 +53,6 @@ public class MixinTitleScreen extends Screen {
             ));
         }
 
-        hasCheckedVersion = true;
+        hasCheckedVersion.set(true);
     }
 }

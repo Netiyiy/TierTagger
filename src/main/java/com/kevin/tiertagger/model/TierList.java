@@ -1,6 +1,5 @@
 package com.kevin.tiertagger.model;
 
-import com.google.gson.Gson;
 import com.kevin.tiertagger.TierTagger;
 
 import java.net.URI;
@@ -18,7 +17,7 @@ public record TierList(List<PlayerInfo> players, List<UUID> unknown) {
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
-                .thenApply(s -> new Gson().fromJson(s, TierList.class))
+                .thenApply(s -> TierTagger.GSON.fromJson(s, TierList.class))
                 .whenComplete((i, t) -> {
                     if (t != null) TierTagger.getLogger().warn("Error fetching tier list", t);
                 });

@@ -23,7 +23,6 @@ import net.minecraft.util.Formatting;
 import net.uku3lig.ukulib.config.ConfigManager;
 import net.uku3lig.ukulib.utils.PlayerArgumentType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +72,14 @@ public class TierTagger implements ModInitializer {
 
     public static Text appendTier(PlayerEntity player, Text text) {
         MutableText following = switch (manager.getConfig().getShownStatistic()) {
-            case TIER -> getPlayerTier(player.getUuid());
+            case TIER -> getPlayerTier(player.getUuid())
+                    .map(entry -> {
+                        String tier = getTierText(entry.getValue());
+                        Text formattedTier = Text.literal(tier).withColor(getTierColor(tier));
+                        MutableText modeIcon = Text.literal(entry.getKey().getIcon()).styled(s -> s.withColor(entry.getKey().getIconColor()));
+                        return modeIcon.append(" ").append(formattedTier);
+                    })
+                    .orElse(null);
             case RANK -> TierCache.getPlayerInfo(player.getUuid())
                     .map(i -> Text.literal("#" + i.overall()))
                     .orElse(null);
@@ -87,8 +93,7 @@ public class TierTagger implements ModInitializer {
         return text;
     }
 
-    @Nullable
-    private static MutableText getPlayerTier(UUID uuid) {
+    public static Optional<Map.Entry<GameMode, PlayerInfo.Ranking>> getPlayerTier(UUID uuid) {
         GameMode mode = manager.getConfig().getGameMode();
 
         return TierCache.getPlayerInfo(uuid)
@@ -102,13 +107,7 @@ public class TierTagger implements ModInitializer {
                     } else {
                         return null;
                     }
-                })
-                .map(entry -> {
-                    String tier = getTierText(entry.getValue());
-                    Text formattedTier = Text.literal(tier).withColor(getTierColor(tier));
-                    return entry.getKey().getIconText().append(" ").append(formattedTier);
-                })
-                .orElse(null);
+                });
     }
 
     @NotNull
@@ -151,7 +150,7 @@ public class TierTagger implements ModInitializer {
             String tier = getTierText(r);
 
             Text tierText = Text.literal(tier).styled(s -> s.withColor(getTierColor(tier)));
-            text.append(Text.literal("\n" + m + ": ").append(tierText));
+            text.append(Text.literal("\n").append(m.formatted()).append(": ").append(tierText));
         });
 
         return text;

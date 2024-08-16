@@ -1,17 +1,12 @@
 package com.kevin.tiertagger.tierlist;
 
-import com.kevin.tiertagger.TierCache;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.client.toast.ToastManager;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-
-import java.util.Locale;
 
 public class PlayerSearchScreen extends Screen {
     private TextFieldWidget textField;
@@ -52,18 +47,7 @@ public class PlayerSearchScreen extends Screen {
 
     private void tryShowProfile() {
         String username = this.textField.getText();
-        TierCache.searchPlayer(username.toLowerCase(Locale.ROOT))
-                .exceptionally(t -> {
-                    sendToast("Could not find player " + username);
-                    return null;
-                });
-
         MinecraftClient.getInstance().setScreen(new PlayerInfoScreen(this, username));
-    }
-
-    private void sendToast(String body) {
-        ToastManager toastManager = MinecraftClient.getInstance().getToastManager();
-        SystemToast.show(toastManager, SystemToast.Type.NARRATOR_TOGGLE, Text.of("Error"), Text.of(body));
     }
 
     @Override

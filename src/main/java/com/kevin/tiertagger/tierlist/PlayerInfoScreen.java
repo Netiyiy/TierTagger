@@ -66,7 +66,8 @@ public class PlayerInfoScreen extends Screen {
         this.renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
 
-        context.drawCenteredTextWithShadow(this.textRenderer, this.player + "'s profile", this.width / 2, 20, 0xFFFFFF);
+        String name = this.info == null ? this.player : this.info.name();
+        context.drawCenteredTextWithShadow(this.textRenderer, name + "'s profile", this.width / 2, 20, 0xFFFFFF);
 
         if (this.texture != null && this.info != null) {
             context.drawTexture(texture, this.width / 2 - 65, (this.height - 144) / 2, 0, 0, 60, 144, 60, 144);

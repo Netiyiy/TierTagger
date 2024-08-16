@@ -90,8 +90,8 @@ public class TierTagger implements ModInitializer {
                     .map(entry -> {
                         String tier = getTierText(entry.getValue());
                         Text formattedTier = Text.literal(tier).withColor(getTierColor(tier));
-                        MutableText modeIcon = Text.literal(entry.getKey().getIcon()).styled(s -> s.withColor(entry.getKey().getIconColor()));
-                        return modeIcon.append(" ").append(formattedTier);
+                        Text modeIcon = Text.literal(entry.getKey().getIcon()).styled(s -> s.withColor(entry.getKey().getIconColor()));
+                        return Text.empty().append(modeIcon).append(" ").append(formattedTier);
                     })
                     .orElse(null);
             case RANK -> TierCache.getPlayerInfo(player.getUuid())

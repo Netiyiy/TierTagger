@@ -1,6 +1,5 @@
 package com.kevin.tiertagger.tierlist;
 
-import com.kevin.tiertagger.TierCache;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -10,9 +9,6 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.uku3lig.ukulib.config.option.widget.TextInputWidget;
 import net.uku3lig.ukulib.config.screen.CloseableScreen;
-import net.uku3lig.ukulib.utils.Ukutils;
-
-import java.util.Locale;
 
 public class PlayerSearchScreen extends CloseableScreen {
     private TextInputWidget textField;
@@ -50,12 +46,6 @@ public class PlayerSearchScreen extends CloseableScreen {
 
     private void tryShowProfile() {
         String username = this.textField.getText();
-        TierCache.searchPlayer(username.toLowerCase(Locale.ROOT))
-                .exceptionally(t -> {
-                    Ukutils.sendToast(Text.of("Error"), Text.of("Could not find player " + username));
-                    return null;
-                });
-
         MinecraftClient.getInstance().setScreen(new PlayerInfoScreen(this, username));
     }
 

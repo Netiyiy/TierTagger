@@ -32,7 +32,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -101,12 +100,20 @@ public class TierTagger implements ModInitializer {
                 .map(info -> {
                     PlayerInfo.Ranking ranking = info.rankings().get(mode);
                     Optional<Map.Entry<GameMode, PlayerInfo.Ranking>> highest = info.getHighestRanking();
-                    if (ranking == null && manager.getConfig().isShowHighest() && highest.isPresent()) {
-                        return highest.get();
-                    } else if (ranking != null) {
-                        return new AbstractMap.SimpleEntry<>(mode, ranking);
+                    TierTaggerConfig.HighestMode highestMode = manager.getConfig().getHighestMode();
+
+                    if (ranking == null) {
+                        if (highestMode != TierTaggerConfig.HighestMode.NEVER && highest.isPresent()) {
+                            return highest.get();
+                        } else {
+                            return null;
+                        }
                     } else {
-                        return null;
+                        if (highestMode == TierTaggerConfig.HighestMode.ALWAYS && highest.isPresent()) {
+                            return highest.get();
+                        } else {
+                            return Map.entry(mode, ranking);
+                        }
                     }
                 });
     }

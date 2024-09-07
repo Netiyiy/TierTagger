@@ -20,11 +20,11 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
 
     @Override
     protected WidgetCreator[] getWidgets(TierTaggerConfig config) {
-        return new WidgetCreator[] {
+        return new WidgetCreator[]{
                 CyclingOption.ofBoolean("tiertagger.config.enabled", config.isEnabled(), config::setEnabled),
                 CyclingOption.ofTranslatableEnum("tiertagger.config.gamemode", GameMode.class, config.getGameMode(), config::setGameMode),
                 CyclingOption.ofBoolean("tiertagger.config.retired", config.isShowRetired(), config::setShowRetired),
-                CyclingOption.ofBoolean("tiertagger.config.highest", config.isShowHighest(), config::setShowHighest, SimpleOption.constantTooltip(Text.translatable("tiertagger.config.highest.desc"))),
+                CyclingOption.ofTranslatableEnum("tiertagger.config.highest", TierTaggerConfig.HighestMode.class, config.getHighestMode(), config::setHighestMode, SimpleOption.constantTooltip(Text.translatable("tiertagger.config.highest.desc"))),
                 CyclingOption.ofTranslatableEnum("tiertagger.config.statistic", TierTaggerConfig.Statistic.class, config.getShownStatistic(), config::setShownStatistic),
                 new SimpleButton("tiertagger.clear", b -> TierCache.clearCache()),
                 new ScreenOpenButton("tiertagger.config.search", PlayerSearchScreen::new)

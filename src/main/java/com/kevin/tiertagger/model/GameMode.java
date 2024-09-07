@@ -36,6 +36,9 @@ public enum GameMode implements TranslatableOption {
     private final String icon;
     private final TextColor iconColor;
 
+    // stored in memory to avoid the cost of calling the method every time
+    private static final GameMode[] values = values();
+
     public MutableText formatted() {
         return Text.literal(this.icon + " " + this.translationKey).styled(s -> s.withColor(this.iconColor));
     }
@@ -47,7 +50,7 @@ public enum GameMode implements TranslatableOption {
     }
 
     public static Optional<GameMode> byKey(String key) {
-        return Arrays.stream(values()).filter(m -> m.apiKey.equalsIgnoreCase(key)).findFirst();
+        return Arrays.stream(values).filter(m -> m.apiKey.equalsIgnoreCase(key)).findFirst();
     }
 
     public static class Deserializer implements JsonDeserializer<GameMode> {

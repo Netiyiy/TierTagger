@@ -11,7 +11,11 @@ import org.spongepowered.asm.mixin.injection.At;
 public class MixinPlayerEntity {
     @ModifyReturnValue(method = "getDisplayName", at = @At("RETURN"))
     public Text prependTier(Text original) {
-        PlayerEntity self = (PlayerEntity) (Object) this;
-        return TierTagger.appendTier(self, original);
+        if (TierTagger.getManager().getConfig().isEnabled()) {
+            PlayerEntity self = (PlayerEntity) (Object) this;
+            return TierTagger.appendTier(self, original);
+        } else {
+            return original;
+        }
     }
 }

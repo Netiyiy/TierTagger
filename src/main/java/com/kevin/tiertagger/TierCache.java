@@ -22,17 +22,25 @@ public class TierCache {
             TIERS.putAll(unknown);
 
             TierTagger.getLogger().info("Loaded {} players and {} unknown", players.size(), unknown.size());
+
+            if (TierTagger.getManager().getConfig().isFetchUnknown()) {
+                TierTagger.getLogger().warn("`fetchUnknown` is set to false! Make sure you are using a tierlist that supports this feature!");
+            }
         });
     }
 
     public static Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
-        return TIERS.computeIfAbsent(uuid, u -> {
-            if (uuid.version() == 4) {
-                PlayerInfo.get(TierTagger.getClient(), uuid).thenAccept(info -> TIERS.put(uuid, Optional.ofNullable(info)));
-            }
+        if (TierTagger.getManager().getConfig().isFetchUnknown()) {
+            return TIERS.computeIfAbsent(uuid, u -> {
+                if (uuid.version() == 4) {
+                    PlayerInfo.get(TierTagger.getClient(), uuid).thenAccept(info -> TIERS.put(uuid, Optional.ofNullable(info)));
+                }
 
-            return Optional.empty();
-        });
+                return Optional.empty();
+            });
+        } else {
+            return TIERS.getOrDefault(uuid, Optional.empty());
+        }
     }
 
     public static CompletableFuture<PlayerInfo> searchPlayer(String query) {

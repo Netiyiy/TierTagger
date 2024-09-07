@@ -12,8 +12,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinPlayerEntity {
     @Inject(method = "getDisplayName", at = @At("RETURN"), cancellable = true)
     public void prependTier(CallbackInfoReturnable<Text> cir) {
-        PlayerEntity self = (PlayerEntity) (Object) this;
-        Text modified = TierTagger.appendTier(self, cir.getReturnValue());
-        cir.setReturnValue(modified);
+        if (TierTagger.getManager().getConfig().isEnabled()) {
+            PlayerEntity self = (PlayerEntity) (Object) this;
+            Text modified = TierTagger.appendTier(self, cir.getReturnValue());
+            cir.setReturnValue(modified);
+        }
     }
 }

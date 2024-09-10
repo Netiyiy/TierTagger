@@ -27,11 +27,6 @@ public class TierTaggerConfig implements Serializable {
      * <p>previous name(s): {@code apiUrl}</p>
      */
     private String baseUrl = "https://api.uku3lig.net/tiers";
-    /**
-     * <p>whether to fetch info about players that are not in the initial database queried from {@code /all}.</p>
-     * <p>it's useful to set this to false when {@code /all} returns <i>all</i> the players contained in the database.</p>
-     */
-    private boolean fetchUnknown = true;
 
     @Getter
     @AllArgsConstructor

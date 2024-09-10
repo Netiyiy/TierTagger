@@ -30,15 +30,17 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class TierTagger implements ModInitializer {
     public static final String MOD_ID = "tiertagger";
+    private static final String UPDATE_URL_FORMAT = "https://api.modrinth.com/v2/project/dpkYdLu5/version?game_versions=%s";
 
     @Getter
     private static final ConfigManager<TierTaggerConfig> manager = ConfigManager.create(TierTaggerConfig.class, MOD_ID);
@@ -47,8 +49,11 @@ public class TierTagger implements ModInitializer {
     private static final Logger logger = LoggerFactory.getLogger(TierTagger.class);
     @Getter
     private static final HttpClient client = HttpClient.newHttpClient();
+
+    // === version checker stuff ===
     @Getter
     private static Version latestVersion = null;
+    private static final AtomicBoolean isObsolete = new AtomicBoolean(false);
 
     @Override
     public void onInitialize() {
@@ -59,10 +64,7 @@ public class TierTagger implements ModInitializer {
                         .then(argument("player", PlayerArgumentType.player())
                                 .executes(TierTagger::displayTierInfo))));
 
-        checkForUpdates().thenAccept(v -> {
-            logger.info("Found latest version {}", v.getFriendlyString());
-            latestVersion = v;
-        });
+        checkForUpdates();
     }
 
     public static Text appendTier(PlayerEntity player, Text text) {
@@ -164,21 +166,25 @@ public class TierTagger implements ModInitializer {
         };
     }
 
-    private static final String UPDATE_URL_FORMAT = "https://api.modrinth.com/v2/project/dpkYdLu5/version?game_versions=%s";
-
-    private static CompletableFuture<Version> checkForUpdates() {
+    private static void checkForUpdates() {
         String versionParam = "[\"%s\"]".formatted(SharedConstants.getGameVersion().getName());
         String fullUrl = UPDATE_URL_FORMAT.formatted(URLEncoder.encode(versionParam, StandardCharsets.UTF_8));
 
         HttpRequest request = HttpRequest.newBuilder(URI.create(fullUrl)).GET().build();
 
-        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(r -> {
                     String body = r.body();
                     JsonArray array = new Gson().fromJson(body, JsonArray.class);
 
                     if (!array.isEmpty()) {
                         JsonObject root = array.get(0).getAsJsonObject();
+
+                        String versionName = root.get("name").getAsString();
+                        if (versionName != null && versionName.toLowerCase(Locale.ROOT).startsWith("[o")) {
+                            isObsolete.set(true);
+                        }
+
                         String latestVer = root.get("version_number").getAsString();
                         try {
                             return Version.parse(latestVer);
@@ -192,6 +198,13 @@ public class TierTagger implements ModInitializer {
                 .exceptionally(t -> {
                     logger.warn("Error checking for updates", t);
                     return null;
+                }).thenAccept(v -> {
+                    logger.info("Found latest version {}", v.getFriendlyString());
+                    latestVersion = v;
                 });
+    }
+
+    public static boolean isObsolete() {
+        return isObsolete.get();
     }
 }

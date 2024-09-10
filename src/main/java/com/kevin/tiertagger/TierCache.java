@@ -23,7 +23,7 @@ public class TierCache {
 
             TierTagger.getLogger().info("Loaded {} players and {} unknown", players.size(), unknown.size());
 
-            if (TierTagger.getManager().getConfig().isFetchUnknown()) {
+            if (!TierTagger.getManager().getConfig().isFetchUnknown()) {
                 TierTagger.getLogger().warn("`fetchUnknown` is set to false! Make sure you are using a tierlist that supports this feature!");
             }
         });

@@ -8,10 +8,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class TierCache {
     private static final Map<UUID, Optional<PlayerInfo>> TIERS = new HashMap<>();
+
+    /**
+     * <p>whether to fetch info about players that are not in the initial database queried from {@code /all}.</p>
+     * <p>it's useful to set this to false when {@code /all} returns <i>all</i> the players contained in the database.</p>
+     * <p>this used to be a config value, but it's better to leave that choice fully to the server</p>
+     * <p>default value is {@code true} to retain some sort of backwards compatibility</p>
+     */
+    private static final AtomicBoolean FETCH_UNKNOWN = new AtomicBoolean(true);
 
     public static void init() {
         TierList.get(TierTagger.getClient()).thenAccept(list -> {
@@ -21,16 +30,19 @@ public class TierCache {
             TIERS.putAll(players);
             TIERS.putAll(unknown);
 
-            TierTagger.getLogger().info("Loaded {} players and {} unknown", players.size(), unknown.size());
-
-            if (!TierTagger.getManager().getConfig().isFetchUnknown()) {
-                TierTagger.getLogger().warn("`fetchUnknown` is set to false! Make sure you are using a tierlist that supports this feature!");
+            if (list.getFetchUnknown() != null) {
+                FETCH_UNKNOWN.set(list.getFetchUnknown());
+                if (!list.getFetchUnknown()) {
+                    TierTagger.getLogger().warn("The remote API set `fetchUnknown` to false! Make sure you are using a tierlist that supports this feature!");
+                }
             }
+
+            TierTagger.getLogger().info("Loaded {} players and {} unknown", players.size(), unknown.size());
         });
     }
 
     public static Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
-        if (TierTagger.getManager().getConfig().isFetchUnknown()) {
+        if (FETCH_UNKNOWN.get()) {
             return TIERS.computeIfAbsent(uuid, u -> {
                 if (uuid.version() == 4) {
                     PlayerInfo.get(TierTagger.getClient(), uuid).thenAccept(info -> TIERS.put(uuid, Optional.ofNullable(info)));

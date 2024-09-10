@@ -1,8 +1,10 @@
 package com.kevin.tiertagger.model;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.kevin.tiertagger.TierTagger;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -17,6 +19,9 @@ import java.util.concurrent.CompletableFuture;
 public class TierList {
     private final List<PlayerInfo> players;
     private final List<UUID> unknown;
+    @SerializedName("fetch_unknown")
+    @Nullable
+    private final Boolean fetchUnknown;
 
     public static CompletableFuture<TierList> get(HttpClient client) {
         String endpoint = TierTagger.getManager().getConfig().getBaseUrl() + "/all";

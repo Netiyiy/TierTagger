@@ -17,5 +17,7 @@
   "tiertagger.outdated.title": "§c§lOutdated TierTagger version detected !!!",
   "tiertagger.outdated.desc": "A new version has been found: %s!\nIt is §nhighly recommended§r to update to keep the mod working!",
   "tiertagger.outdated.download": "§aDownload new version",
-  "tiertagger.outdated.ignore": "§4Ignore (not recommended)"
+  "tiertagger.outdated.ignore": "§4Ignore (not recommended)",
+  "tiertagger.obsolete.title": "§c§lObsolete Minecraft version detected !!!",
+  "tiertagger.obsolete.desc": "You are playing on an §nunsupported Minecraft version.§r\nThis version is likely broken, and you should consider upgrading your Minecraft as soon as possible."
 }

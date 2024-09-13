@@ -181,22 +181,10 @@ public class TierTagger implements ModInitializer {
 
     public static int getTierColor(String tier) {
         if (tier.startsWith("R")) {
-            return 0x662B99; // ourple
+            return manager.getConfig().getRetiredColor();
+        } else {
+            return manager.getConfig().getTierColors().getOrDefault(tier, 0xD3D3D3);
         }
-
-        return switch (tier) {
-            case "HT1" -> 0xFF0000; // red
-            case "LT1" -> 0xFFB6C1; // light pink
-            case "HT2" -> 0xFFA500; // orange
-            case "LT2" -> 0xFFE4B5; // light orange
-            case "HT3" -> 0xDAA520; // goldenrod
-            case "LT3" -> 0xEEE8AA; // pale goldenrod
-            case "HT4" -> 0x006400; // dark green
-            case "LT4" -> 0x90EE90; // light green
-            case "HT5" -> 0x808080; // grey
-            case "LT5" -> 0xD3D3D3; // pale grey
-            default -> 0xD3D3D3; // DEFAULT: pale grey
-        };
     }
 
     private static void checkForUpdates() {

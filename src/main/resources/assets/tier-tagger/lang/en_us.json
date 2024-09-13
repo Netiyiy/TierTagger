@@ -1,5 +1,6 @@
 {
   "tiertagger.name": "TierTagger",
+  "tiertagger.config": "Settings",
   "tiertagger.config.enabled": "Enabled",
   "tiertagger.config.gamemode": "Gamemode",
   "tiertagger.config.retired": "Show Retired",
@@ -7,6 +8,8 @@
   "tiertagger.config.highest.desc": "- Never: only display tiers in the selected gamemode\n- When Not Found: if a person isn't ranked in the current selected gamemode, show their highest tier overall\n- Always: display a person's highest tier, regardless of the gamemode",
   "tiertagger.config.statistic": "Shown Statistic",
   "tiertagger.config.search": "Search Player",
+  "tiertagger.colors": "Colors",
+  "tiertagger.colors.retired": "Retired",
   "tiertagger.search": "Search",
   "tiertagger.search.user": "Username",
   "tiertagger.clear": "Clear Tiers Cache",

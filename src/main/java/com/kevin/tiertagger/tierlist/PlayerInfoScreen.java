@@ -24,6 +24,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
 
 @Setter
@@ -131,10 +134,13 @@ public class PlayerInfoScreen extends CloseableScreen {
                     .append(Text.literal(")").styled(s -> s.withColor(Formatting.GRAY)));
         }
 
+        String date = DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneOffset.UTC).format(Instant.ofEpochSecond(tier.attained()));
+
         return Text.empty()
                 .append(mode.formatted())
                 .append(Text.literal(": ").formatted(Formatting.GRAY))
-                .append(tierText);
+                .append(tierText)
+                .append(Text.literal(" (" + date + ")").formatted(Formatting.GRAY));
     }
 
     private MutableText getTierText(int tier, int pos, boolean retired) {

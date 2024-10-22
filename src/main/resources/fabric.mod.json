@@ -21,8 +21,8 @@
     "TierTagger.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.15",
-    "minecraft": ">=1.21",
-    "ukulib": "^1.4.1"
+    "fabricloader": ">=0.16",
+    "minecraft": ">=1.21.2",
+    "ukulib": "^1.5.0"
   }
 }

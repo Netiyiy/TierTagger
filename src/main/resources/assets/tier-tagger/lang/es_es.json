@@ -1,0 +1,16 @@
+{
+  "tiertagger.config.enabled": "Habilitado",
+  "tiertagger.config.gamemode": "Modo de juego",
+  "tiertagger.config.unranked": "Mostrar sin clasificar",
+  "tiertagger.config.retired": "Mostrar retirado",
+  "tiertagger.config.statistic": "Estadística mostrada",
+  "tiertagger.clear": "Borrar Tier Caché",
+  "tiertagger.stat.tier": "Tier",
+  "tiertagger.stat.rank": "Rango",
+  "tiertagger.outdated.title": "§c§lVersión desactualizada de TierTagger detectado !!!",
+  "tiertagger.outdated.desc": "Se ha encontrado una nueva versión: %s!\nEs §naltamente recomendable§r actualizar para mantener el mod de trabajo!",
+  "tiertagger.outdated.download": "§aDescargar la nueva versión",
+  "tiertagger.outdated.ignore": "§4Ignorar (no se recomienda) ",
+  "tiertagger.obsolete.title": "§c§lObsolote Minecraft versión detectada !!!",
+  "tiertagger.obsolete.desc": "Estás jugando en una §nversión de Minecraft no soportada.§r\nEsta versión es probable que esté roto, y usted debe considerar la actualización de su Minecraft tan pronto como sea posible."
+}

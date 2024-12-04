@@ -19,6 +19,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.uku3lig.ukulib.config.screen.CloseableScreen;
+import net.uku3lig.ukulib.utils.Ukutils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -95,15 +96,11 @@ public class PlayerInfoScreen extends CloseableScreen {
         }
     }
 
-    private boolean textureExists(Identifier texture) {
-        return MinecraftClient.getInstance().getTextureManager().getOrDefault(texture, null) != null;
-    }
-
     private CompletableFuture<Identifier> fetchTexture(String user) {
         String username = user.toLowerCase();
         Identifier tex = Identifier.of(TierTagger.MOD_ID, "player_" + username);
 
-        if (textureExists(tex)) return CompletableFuture.completedFuture(tex);
+        if (Ukutils.textureExists(tex)) return CompletableFuture.completedFuture(tex);
 
         TextureManager texManager = MinecraftClient.getInstance().getTextureManager();
         HttpRequest req = HttpRequest.newBuilder(URI.create("https://mc-heads.net/body/" + username + "/240")).GET().build();

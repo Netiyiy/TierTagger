@@ -32,7 +32,7 @@ public class TierCache {
 
             if (list.fetchUnknown() != null) {
                 FETCH_UNKNOWN.set(list.fetchUnknown());
-                if (!list.fetchUnknown()) {
+                if (Boolean.FALSE.equals(list.fetchUnknown())) {
                     TierTagger.getLogger().warn("The remote API set `fetchUnknown` to false! Make sure you are using a tierlist that supports this feature!");
                 }
             }

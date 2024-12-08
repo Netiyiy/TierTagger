@@ -3,16 +3,16 @@ package com.kevin.tiertagger;
 import com.kevin.tiertagger.model.PlayerInfo;
 import com.kevin.tiertagger.model.TierList;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class TierCache {
-    private static final Map<UUID, Optional<PlayerInfo>> TIERS = new HashMap<>();
+    private static final Map<UUID, Optional<PlayerInfo>> TIERS = new ConcurrentHashMap<>();
 
     /**
      * <p>whether to fetch info about players that are not in the initial database queried from {@code /all}.</p>

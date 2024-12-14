@@ -8,7 +8,10 @@ group = project.maven_group
 
 repositories {
     maven {
-        url "https://maven.uku3lig.net/releases"
+        url = "https://maven.uku3lig.net/releases"
+    }
+    maven {
+        url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1"
     }
 }
 
@@ -21,6 +24,8 @@ dependencies {
     modImplementation(fabricApi.module("fabric-command-api-v2", project.fabric_api_version))
 
     modApi "net.uku3lig:ukulib:${project.ukulib_version}"
+
+    modRuntimeOnly "me.djtheredstoner:DevAuth-fabric:${project.devauth_version}"
 }
 
 processResources {

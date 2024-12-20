@@ -134,8 +134,8 @@ public class PlayerInfoScreen extends CloseableScreen {
 
         String date = DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneOffset.UTC).format(Instant.ofEpochSecond(tier.attained()));
 
-        return Text.empty()
-                .append(mode.formatted())
+        return Text.literal("• ")
+                .append(mode.render())
                 .append(Text.literal(": ").formatted(Formatting.GRAY))
                 .append(tierText)
                 .append(Text.literal(" (" + date + ")").formatted(Formatting.GRAY));

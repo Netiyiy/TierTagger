@@ -1,10 +1,10 @@
 package com.kevin.tiertagger.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.kevin.tiertagger.TierTagger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-import com.kevin.tiertagger.TierTagger;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -13,7 +13,7 @@ import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankings, String region, int points,
+public record PlayerInfo(String uuid, String name, Map<String, Ranking> rankings, String region, int points,
                          int overall, List<Badge> badges) {
     public record Ranking(int tier, int pos, @Nullable @SerializedName("peak_tier") Integer peakTier,
                           @Nullable @SerializedName("peak_pos") Integer peakPos, long attained,
@@ -83,7 +83,9 @@ public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankin
     }
 
     public Optional<Map.Entry<GameMode, Ranking>> getHighestRanking() {
-        return this.rankings.entrySet().stream().min(Comparator.comparingInt(e -> e.getValue().comparableTier()));
+        return this.rankings.entrySet().stream()
+                .min(Comparator.comparingInt(e -> e.getValue().comparableTier()))
+                .flatMap(e -> GameMode.find(e.getKey()).map(g -> Map.entry(g, e.getValue())));
     }
 
     @Getter
@@ -121,14 +123,13 @@ public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankin
     }
 
     public List<NamedRanking> getSortedTiers() {
-        List<NamedRanking> tiers = new ArrayList<>(this.rankings.entrySet().stream()
-                .map(e -> new NamedRanking(e.getKey(), e.getValue()))
-                .toList());
-
-        tiers.sort(Comparator.comparing((NamedRanking a) -> a.ranking.retired, Boolean::compare)
-                .thenComparingInt(a -> a.ranking.tier)
-                .thenComparingInt(a -> a.ranking.pos));
-
-        return tiers;
+        return this.rankings.entrySet().stream()
+                .map(e -> GameMode.find(e.getKey()).map(g -> new NamedRanking(g, e.getValue())))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(Comparator.comparing((NamedRanking a) -> a.ranking.retired, Boolean::compare)
+                        .thenComparingInt(a -> a.ranking.tier)
+                        .thenComparingInt(a -> a.ranking.pos))
+                .toList();
     }
 }

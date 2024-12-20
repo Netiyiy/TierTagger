@@ -3,6 +3,7 @@ package com.kevin.tiertagger.config;
 import com.kevin.tiertagger.TierCache;
 import com.kevin.tiertagger.TierTagger;
 import com.kevin.tiertagger.model.GameMode;
+import com.kevin.tiertagger.model.KnownGamemode;
 import com.kevin.tiertagger.tierlist.PlayerSearchScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.Tab;
@@ -32,9 +33,11 @@ public class TTConfigScreen extends TabbedConfigScreen<TierTaggerConfig> {
 
         @Override
         protected WidgetCreator[] getWidgets(TierTaggerConfig config) {
+            GameMode currentMode = GameMode.find(config.getGameMode()).orElse(GameMode.fromKnown(KnownGamemode.VANILLA));
+
             return new WidgetCreator[]{
                     CyclingOption.ofBoolean("tiertagger.config.enabled", config.isEnabled(), config::setEnabled),
-                    CyclingOption.ofTranslatableEnum("tiertagger.config.gamemode", GameMode.class, config.getGameMode(), config::setGameMode),
+                    new CyclingOption<>("tiertagger.config.gamemode", TierTagger.getGameModes(), currentMode, g -> config.setGameMode(g.apiKey()), GameMode::render),
                     CyclingOption.ofBoolean("tiertagger.config.retired", config.isShowRetired(), config::setShowRetired),
                     CyclingOption.ofTranslatableEnum("tiertagger.config.highest", TierTaggerConfig.HighestMode.class, config.getHighestMode(), config::setHighestMode, SimpleOption.constantTooltip(Text.translatable("tiertagger.config.highest.desc"))),
                     CyclingOption.ofTranslatableEnum("tiertagger.config.statistic", TierTaggerConfig.Statistic.class, config.getShownStatistic(), config::setShownStatistic),

@@ -3,4 +3,4 @@ A gorgeous minecraft fabric mod which displays everyone's tier from the Vanilla 
 
 Very smol but very useful mod; you'll likey likey :)
 
-# Founded by netiyiy
+**Founded by netiyiy**

@@ -19,6 +19,7 @@ public class TierTaggerConfig implements Serializable {
     private boolean showRetired = true;
     private HighestMode highestMode = HighestMode.NOT_FOUND;
     private Statistic shownStatistic = Statistic.TIER;
+    private boolean showIcons = true;
 
     // === internal stuff ===
 

@@ -3,12 +3,14 @@
   "id": "tier-tagger",
   "version": "${version}",
   "name": "TierTagger",
-  "description": "A gorgeous mod which displays everyone's tier from the Vanilla Pvp Tierlist in game",
-  "authors": ["netiyiy", "uku"],
-  "contact": {},
-  "license": "MIT",
+  "description": "Display player's PvP Tiers in their nametag!",
+  "authors": ["uku", "netiyiy (original creator)"],
+  "contact": {
+    "sources": "https://github.com/mctiers-dev/TierTagger.git"
+  },
+  "license": "MPL-2.0",
   "icon": "assets/tier-tagger/icon.png",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
       "com.kevin.tiertagger.TierTagger"

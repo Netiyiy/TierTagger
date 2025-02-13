@@ -69,7 +69,7 @@ public class PlayerInfoScreen extends CloseableScreen {
             context.drawTexture(texture, this.width / 2 - 65, (this.height - 144) / 2, 0, 0, 60, 144, 60, 144);
 
             int rankingHeight = this.info.rankings().size() * 10;
-            int infoHeight = 55; // 4 lines of text (10 px tall) + 5 px padding
+            int infoHeight = 56; // 4 lines of text (10 px tall) + 6 px padding
             int startY = (this.height - infoHeight - rankingHeight) / 2;
 
             context.drawTextWithShadow(this.textRenderer, getRegionText(this.info), this.width / 2 + 5, startY, 0xFFFFFF);
@@ -83,7 +83,7 @@ public class PlayerInfoScreen extends CloseableScreen {
                 PlayerInfo.Ranking ranking = namedRanking.ranking();
 
                 context.drawTextWithShadow(this.textRenderer, formatTier(mode, ranking), this.width / 2 + 5, rankingY, 0xFFFFFF);
-                rankingY += 10;
+                rankingY += 11;
             }
         } else {
             String text = this.everythingIsAwesome ? "Loading..." : "Unknown player";
@@ -124,7 +124,7 @@ public class PlayerInfoScreen extends CloseableScreen {
         MutableText tierText = getTierText(tier.tier(), tier.pos(), tier.retired());
 
         if (tier.comparablePeak() < tier.comparableTier()) {
-            // caused by potential NPE by unboxing of peak{Tier,Pos} which CANNOT happen, see impl of comparablePeak
+            // warning caused by potential NPE by unboxing of peak{Tier,Pos} which CANNOT happen, see impl of comparablePeak
             // noinspection DataFlowIssue
             tierText = tierText.append(Text.literal(" (peak: ").styled(s -> s.withColor(Formatting.GRAY)))
                     .append(getTierText(tier.peakTier(), tier.peakPos(), tier.retired()))
@@ -142,13 +142,7 @@ public class PlayerInfoScreen extends CloseableScreen {
         if (retired) text.append("R");
         text.append(pos == 0 ? "H" : "L").append("T").append(tier);
 
-        int color;
-        if (retired) {
-            color = 0xa177ff;
-        } else {
-            color = pos == 0 ? 0x3e71f4 : 0x80b5ff;
-        }
-
+        int color = TierTagger.getTierColor(text.toString());
         return Text.literal(text.toString()).styled(s -> s.withColor(color));
     }
 
@@ -169,10 +163,10 @@ public class PlayerInfoScreen extends CloseableScreen {
 
     private Text getRankText(PlayerInfo info) {
         int color = switch (info.overall()) {
-            case 1 -> 0xffd700;
-            case 2 -> 0xc0c0c0;
-            case 3 -> 0xcd7f32;
-            default -> 0xffffff;
+            case 1 -> 0xe5ba43;
+            case 2 -> 0x808c9c;
+            case 3 -> 0xb56326;
+            default -> 0x1e2634;
         };
 
         return Text.empty()

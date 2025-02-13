@@ -167,22 +167,15 @@ public class TierTagger implements ModInitializer {
     }
 
     public static int getTierColor(String tier) {
-        if (tier.startsWith("R")) {
-            return 0x662B99; // ourple
-        }
-
-        return switch (tier) {
-            case "HT1" -> 0xFF0000; // red
-            case "LT1" -> 0xFFB6C1; // light pink
-            case "HT2" -> 0xFFA500; // orange
-            case "LT2" -> 0xFFE4B5; // light orange
-            case "HT3" -> 0xDAA520; // goldenrod
-            case "LT3" -> 0xEEE8AA; // pale goldenrod
-            case "HT4" -> 0x006400; // dark green
-            case "LT4" -> 0x90EE90; // light green
-            case "HT5" -> 0x808080; // grey
-            case "LT5" -> 0xD3D3D3; // pale grey
-            default -> 0xD3D3D3; // DEFAULT: pale grey
+        if (tier.startsWith("R")) return 0xa2d6ff;
+        else return switch (tier) {
+            case "HT1" -> 0xffc935;
+            case "LT1" -> 0xd5b355;
+            case "HT2" -> 0xa4b3c7;
+            case "LT2" -> 0x888d95;
+            case "HT3" -> 0xb56326;
+            case "LT3" -> 0x8f5931;
+            default -> 0x1e2634;
         };
     }
 

@@ -32,6 +32,7 @@ public class TTConfigScreen extends AbstractConfigScreen<TierTaggerConfig> {
                 new SimpleOption<>("tiertagger.config.statistic", SimpleOption.emptyTooltip(), SimpleOption.enumValueText(),
                         new SimpleOption.PotentialValuesBasedCallbacks<>(Arrays.asList(TierTaggerConfig.Statistic.values()), Codec.INT.xmap(TierTaggerConfig.Statistic::byId, TierTaggerConfig.Statistic::getId)),
                         config.getShownStatistic(), config::setShownStatistic),
+                SimpleOption.ofBoolean("tiertagger.config.icons", config.isShowIcons(), config::setShowIcons),
                 Ukutils.createButton("tiertagger.clear", s -> TierCache.clearCache()),
                 Ukutils.createOpenButton("tiertagger.config.search", PlayerSearchScreen::new),
         };

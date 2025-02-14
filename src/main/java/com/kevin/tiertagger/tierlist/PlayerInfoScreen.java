@@ -8,7 +8,9 @@ import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -82,10 +84,15 @@ public class PlayerInfoScreen extends CloseableScreen {
 
             int rankingY = startY + infoHeight;
             for (PlayerInfo.NamedRanking namedRanking : this.info.getSortedTiers()) {
-                GameMode mode = namedRanking.mode();
-                PlayerInfo.Ranking ranking = namedRanking.ranking();
+                TextWidget text = new TextWidget(formatTier(namedRanking.mode(), namedRanking.ranking()), this.textRenderer);
+                text.setX(this.width / 2 + 5);
+                text.setY(rankingY);
 
-                context.drawTextWithShadow(this.textRenderer, formatTier(mode, ranking), this.width / 2 + 5, rankingY, 0xFFFFFF);
+                String date = DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneOffset.UTC).format(Instant.ofEpochSecond(namedRanking.ranking().attained()));
+                Text tooltipText = Text.literal("Attained: " + date + "\nPoints: " + points(namedRanking.ranking())).formatted(Formatting.GRAY);
+                text.setTooltip(Tooltip.of(tooltipText));
+
+                this.addDrawableChild(text);
                 rankingY += 11;
             }
         } else {
@@ -134,13 +141,10 @@ public class PlayerInfoScreen extends CloseableScreen {
                     .append(Text.literal(")").styled(s -> s.withColor(Formatting.GRAY)));
         }
 
-        String date = DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneOffset.UTC).format(Instant.ofEpochSecond(tier.attained()));
-
         return Text.empty()
                 .append(mode.formatted())
                 .append(Text.literal(": ").formatted(Formatting.GRAY))
-                .append(tierText)
-                .append(Text.literal(" (" + date + ")").formatted(Formatting.GRAY));
+                .append(tierText);
     }
 
     private MutableText getTierText(int tier, int pos, boolean retired) {
@@ -178,5 +182,23 @@ public class PlayerInfoScreen extends CloseableScreen {
         return Text.empty()
                 .append(Text.literal("Global rank: "))
                 .append(Text.literal("#" + info.overall()).styled(s -> s.withColor(color)));
+    }
+
+    private int points(PlayerInfo.Ranking ranking) {
+        String tier = getTierText(ranking.tier(), ranking.pos(), false).getString();
+
+        return switch (tier) {
+            case "HT1" -> 60;
+            case "LT1" -> 45;
+            case "HT2" -> 30;
+            case "LT2" -> 20;
+            case "HT3" -> 10;
+            case "LT3" -> 6;
+            case "HT4" -> 4;
+            case "LT4" -> 3;
+            case "HT5" -> 2;
+            case "LT5" -> 1;
+            default -> 0;
+        };
     }
 }

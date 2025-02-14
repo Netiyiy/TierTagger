@@ -22,10 +22,11 @@ public enum GameMode implements TranslatableOption {
     SWORD(0, "Sword", "sword", "\uD83D\uDDE1", TextColor.fromRgb(0xa4fdf0)),
     VANILLA(1, "Vanilla", "vanilla", "✦", TextColor.fromFormatting(Formatting.LIGHT_PURPLE)),
     AXE(2, "Axe", "axe", "\uD83E\uDE93", TextColor.fromFormatting(Formatting.GREEN)),
-    POT(3, "Pot", "pot", "\uD83E\uDDEA", TextColor.fromRgb(0xff0000)),
-    NETH_POT(4, "NethPot", "neth_pot", "☠", TextColor.fromRgb(0x7d4a40)),
+    POT(3, "Pot", "pot", "⚗", TextColor.fromRgb(0xff0000)),
+    NETH_POT(4, "Netherite OP", "nethop", "☠", TextColor.fromRgb(0x7d4a40)),
     UHC(5, "UHC", "uhc", "❤", TextColor.fromFormatting(Formatting.RED)),
     SMP(6, "SMP", "smp", "⛨", TextColor.fromRgb(0xeccb45)),
+    MACE(7, "Mace", "mace", "\uD83D\uDD28", TextColor.fromFormatting(Formatting.GRAY))
     ;
 
     private final int id;

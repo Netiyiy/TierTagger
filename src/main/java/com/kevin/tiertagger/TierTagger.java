@@ -181,7 +181,7 @@ public class TierTagger implements ModInitializer {
             case "LT2" -> 0x888d95;
             case "HT3" -> 0xb56326;
             case "LT3" -> 0x8f5931;
-            default -> 0x1e2634;
+            default -> 0x655b79;
         };
     }
 

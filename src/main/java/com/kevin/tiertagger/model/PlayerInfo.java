@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankings, String region, int points,
-                         int overall, List<Badge> badges) {
+                         int overall, List<Badge> badges, @SerializedName("combat_master") boolean combatMaster) {
     public record Ranking(int tier, int pos, @Nullable @SerializedName("peak_tier") Integer peakTier,
                           @Nullable @SerializedName("peak_pos") Integer peakPos, long attained,
                           boolean retired) {
@@ -105,7 +105,7 @@ public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankin
     }
 
     public PointInfo getPointInfo() {
-        if (this.points >= 235 && this.rankings.values().stream().allMatch(r -> r.tier <= 2 || (r.peakTier != null && r.peakTier <= 2))) {
+        if (this.combatMaster || this.points >= 200 && this.rankings.values().stream().allMatch(r -> r.tier <= 2 || (r.peakTier != null && r.peakTier <= 2))) {
             return PointInfo.COMBAT_MASTER;
         } else if (this.points >= 100) {
             return PointInfo.COMBAT_ACE;

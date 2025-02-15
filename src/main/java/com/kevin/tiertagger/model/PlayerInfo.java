@@ -1,10 +1,10 @@
 package com.kevin.tiertagger.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.kevin.tiertagger.TierTagger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-import com.kevin.tiertagger.TierTagger;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -38,7 +38,7 @@ public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankin
         }
     }
 
-    public record NamedRanking(GameMode mode, Ranking ranking) {
+    public record NamedRanking(@Nullable GameMode mode, Ranking ranking) {
     }
 
     public record Badge(String title, String desc) {
@@ -83,7 +83,9 @@ public record PlayerInfo(String uuid, String name, Map<GameMode, Ranking> rankin
     }
 
     public Optional<Map.Entry<GameMode, Ranking>> getHighestRanking() {
-        return this.rankings.entrySet().stream().min(Comparator.comparingInt(e -> e.getValue().comparableTier()));
+        return this.rankings.entrySet().stream()
+                .filter(e -> e.getKey() != null)
+                .min(Comparator.comparingInt(e -> e.getValue().comparableTier()));
     }
 
     @Getter

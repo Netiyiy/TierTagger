@@ -18,6 +18,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -83,6 +84,9 @@ public class PlayerInfoScreen extends Screen {
 
             int rankingY = startY + infoHeight;
             for (PlayerInfo.NamedRanking namedRanking : this.info.getSortedTiers()) {
+                // ugly "fix" to avoid crashes if upstream doesn't have the right names
+                if (namedRanking.mode() == null) continue;
+
                 GameMode mode = namedRanking.mode();
                 PlayerInfo.Ranking ranking = namedRanking.ranking();
 
@@ -157,7 +161,7 @@ public class PlayerInfoScreen extends Screen {
         });
     }
 
-    private Text formatTier(GameMode mode, PlayerInfo.Ranking tier) {
+    private Text formatTier(@NotNull GameMode mode, PlayerInfo.Ranking tier) {
         MutableText tierText = getTierText(tier.tier(), tier.pos(), tier.retired());
 
         if (tier.comparablePeak() < tier.comparableTier()) {

@@ -22,6 +22,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.uku3lig.ukulib.config.screen.CloseableScreen;
 import net.uku3lig.ukulib.utils.Ukutils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -86,6 +87,9 @@ public class PlayerInfoScreen extends CloseableScreen {
 
             int rankingY = startY + infoHeight;
             for (PlayerInfo.NamedRanking namedRanking : this.info.getSortedTiers()) {
+                // ugly "fix" to avoid crashes if upstream doesn't have the right names
+                if (namedRanking.mode() == null) continue;
+
                 TextWidget text = new TextWidget(formatTier(namedRanking.mode(), namedRanking.ranking()), this.textRenderer);
                 text.setX(this.width / 2 + 5);
                 text.setY(rankingY);
@@ -128,7 +132,7 @@ public class PlayerInfoScreen extends CloseableScreen {
         });
     }
 
-    private Text formatTier(GameMode mode, PlayerInfo.Ranking tier) {
+    private Text formatTier(@NotNull GameMode mode, PlayerInfo.Ranking tier) {
         MutableText tierText = getTierText(tier.tier(), tier.pos(), tier.retired());
 
         if (tier.comparablePeak() < tier.comparableTier()) {

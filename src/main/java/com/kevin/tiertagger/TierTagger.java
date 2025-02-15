@@ -176,6 +176,7 @@ public class TierTagger implements ModInitializer {
         MutableText text = Text.empty().append("=== Rankings for " + info.name() + " ===");
 
         info.rankings().forEach((m, r) -> {
+            if (m == null) return;
             String tier = getTierText(r);
 
             Text tierText = Text.literal(tier).styled(s -> s.withColor(getTierColor(tier)));
